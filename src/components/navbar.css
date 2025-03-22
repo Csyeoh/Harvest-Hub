@@ -1,0 +1,6 @@
+/* MainNavbar.css */
+.main-navbar {
+    height: 60px;
+    padding: 0 1rem;
+    z-index: 1000;
+  }
