@@ -14,7 +14,7 @@ function App() {
       <Routes>
         {/* Routes with MainNavbar (Home, About) */}
         <Route
-          path=" a"
+          path="/"
           element={
             <>
               <MainNavbar />
