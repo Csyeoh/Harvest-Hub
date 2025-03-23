@@ -1,10 +1,25 @@
 // pages/Dashboard.jsx
 import React from 'react';
+import CurrentWeather from '../components/CurrentWeather';
+import NextHarvest from '../components/NextHarvest';
+import Markets from '../components/Markets';
+import WeatherForecast from '../components/WeatherForecast';
+import SoilStatus from '../components/SoilStatus';
+import '/AcademicUSM/Harvest-Hub/src/App.css'
 
 const Dashboard = () => {
   return (
-    <div>
-    </div>
+    <><div className="top-row">
+      <CurrentWeather />
+      <NextHarvest />
+      <Markets />
+    </div><div className="mid-row">
+        <div className="bottom-row">
+          <WeatherForecast />
+          <SoilStatus />
+        </div>
+
+      </div></>
   );
 };
 

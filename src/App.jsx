@@ -2,11 +2,15 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import MainNavbar from './components/navbar';
-import Sidebar from './components/sidebar';
-import TopNavbar from './components/dashboard-top';
+import DashboardLayout from './components/DashboardLayout';
 import Home from './pages/home';
 import About from './pages/about';
-import Dashboard from './pages/dashboard';
+import Dashboard from './pages/Dashboard';
+import CropCultivation from './pages/CropCultivation';
+import Calendar from './pages/Calendar';
+import ChatAssistant from './pages/ChatAssistant';
+import FarmReport from './pages/FarmReport';
+import Settings from './pages/Settings';
 
 function App() {
   return (
@@ -35,21 +39,15 @@ function App() {
             </>
           }
         />
-        {/* Route with Sidebar and TopNavbar (Dashboard) */}
-        <Route
-          path="/dashboard"
-          element={
-            <>
-              <TopNavbar />
-              <div className="d-flex" style={{ marginTop: '60px' }}>
-                <Sidebar />
-                <div className="main-content flex-grow-1 p-3">
-                  <Dashboard />
-                </div>
-              </div>
-            </>
-          }
-        />
+        {/* Dashboard Routes with Sidebar and TopNavbar */}
+        <Route path="/dashboard/*" element={<DashboardLayout />}>
+          <Route index element={<Dashboard />} /> {/* /dashboard */}
+          <Route path="crop-cultivation" element={<CropCultivation />} /> {/* /dashboard/crop-cultivation */}
+          <Route path="calendar" element={<Calendar />} /> {/* /dashboard/calendar */}
+          <Route path="chat" element={<ChatAssistant />} /> {/* /dashboard/chat */}
+          <Route path="farm-report" element={<FarmReport />} /> {/* /dashboard/farm-report */}
+          <Route path="settings" element={<Settings />} /> {/* /dashboard/settings */}
+        </Route>
       </Routes>
     </Router>
   );

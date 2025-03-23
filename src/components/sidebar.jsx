@@ -2,7 +2,7 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Nav, Navbar, NavDropdown } from 'react-bootstrap';
-import { Link } from 'react-router-dom'; // Import Link for navigation
+import { Link, NavLink } from 'react-router-dom';
 import './Sidebar.css';
 
 const Sidebar = () => {
@@ -27,33 +27,38 @@ const Sidebar = () => {
               </span>
             }
             id="plant-profile-dropdown"
-            className="mb-2"
+            className="mb-2 plant-profile-dropdown"
           >
             <NavDropdown.Item href="#plants/flowers">Flowers</NavDropdown.Item>
             <NavDropdown.Item href="#plants/vegetables">Vegetables</NavDropdown.Item>
             <NavDropdown.Item href="#plants/trees">Trees</NavDropdown.Item>
             <NavDropdown.Item href="#plants/crops">Crops</NavDropdown.Item>
           </NavDropdown>
-          <Nav.Link href="#crop-cultivation" className="mb-2">
+          
+          <NavLink to="/dashboard" className="nav-link mb-2" end>
+            <i className="bi bi-grain me-2"></i>
+            Dashboard
+          </NavLink>
+          <NavLink to="/dashboard/crop-cultivation" className="nav-link mb-2">
             <i className="bi bi-grain me-2"></i>
             Crop Cultivation
-          </Nav.Link>
-          <Nav.Link href="#calendar" className="mb-2">
+          </NavLink>
+          <NavLink to="/dashboard/calendar" className="nav-link mb-2">
             <i className="bi bi-calendar3 me-2"></i>
             Calendar
-          </Nav.Link>
-          <Nav.Link href="#chat" className="mb-2">
+          </NavLink>
+          <NavLink to="/dashboard/chat" className="nav-link mb-2">
             <i className="bi bi-chat-dots me-2"></i>
             Chat Assistant
-          </Nav.Link>
-          <Nav.Link href="#farm-report" className="mb-2">
+          </NavLink>
+          <NavLink to="/dashboard/farm-report" className="nav-link mb-2">
             <i className="bi bi-clipboard-data me-2"></i>
             Farm Report
-          </Nav.Link>
-          <Nav.Link href="#settings" className="mt-auto">
+          </NavLink>
+          <NavLink to="/dashboard/settings" className="nav-link mt-auto">
             <i className="bi bi-gear me-2"></i>
             Settings
-          </Nav.Link>
+          </NavLink>
         </Nav>
       </Navbar>
     </div>
