@@ -13,13 +13,15 @@ import ChatAssistant from './pages/ChatAssistant';
 import FarmReport from './pages/FarmReport';
 import Settings from './pages/Settings';
 import Footer from './components/footer';
+// import Login from './pages/Login';
+// import Signup from './pages/Signup';
 
 function App() {
   return (
     <Router>
       <Routes>
         {/* Routes with MainNavbar (Home, About) */}
-        <Route
+        <Route 
           path="/"
           element={
             <>
@@ -42,6 +44,8 @@ function App() {
             </>
           }
         />
+        {/* <Route path="login" element={<Login />} /> 
+        <Route path="signup" element={<Signup />} />  */}
         {/* Dashboard Routes with Sidebar and TopNavbar */}
         <Route path="/dashboard/*" element={<DashboardLayout />}>
           <Route index element={<Dashboard />} /> {/* /dashboard */}
