@@ -1,6 +1,5 @@
 import React from 'react';
 import './home.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
 
 const Home = () => {
   return (
@@ -8,14 +7,14 @@ const Home = () => {
       {/* Hero Section */}
       <section className="hero text-center text-white d-flex align-items-center justify-content-center">
         <div>
-          <p className="welcome-text">Welcome to Agrios Farming</p>
+          <p className="welcome-text">Welcome to CropWise!</p>
           <h1 className="hero-title">
-            Agriculture <span className="highlight">Eco Farming</span>
+            Double Your Yield, <span className="highlight">Sustainably</span>
           </h1>
           <p className="hero-description">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.
+            Empowering farmers with accessible, scalable AI tools to boost productivity and income while nurturing the planet.
           </p>
-          <button className="btn btn-success">Discover More</button>
+          <button className="btn btn-success">Start Farming Smarter</button>
         </div>
       </section>
 
@@ -25,23 +24,23 @@ const Home = () => {
           <div className="row">
             <div className="col-md-4">
               <div className="feature-card p-4 text-center">
-                <h4 className="feature-title">Feature 01</h4>
-                <h3>We're using a new technology</h3>
-                <img src="path-to-feature1-image.jpg" alt="Feature 1" className="img-fluid rounded" />
+                <h4 className="feature-title">AI-Powered Crop Insights</h4>
+                <h3>Analyze satellite imagery, weather data (rainfall, temperature, humidity), and soil sensors to monitor crop health and predict risks like pests or poor yields.</h3>
+                <img src="/assets/feature1.png" alt="Feature 1" className="img-fluid rounded" />
               </div>
             </div>
             <div className="col-md-4">
               <div className="feature-card p-4 text-center">
-                <h4 className="feature-title">Feature 02</h4>
-                <h3>Good in smart organic services</h3>
-                <img src="path-to-feature2-image.jpg" alt="Feature 2" className="img-fluid rounded" />
+                <h4 className="feature-title">Smart Irrigation & Alerts</h4>
+                <h3>Get data-driven irrigation recommendations and SMS alerts to optimize water use and reduce fertilizer overuse—works offline too!</h3>
+                <img src="/assets/feature2.jpg" alt="Feature 2" className="img-fluid rounded" />
               </div>
             </div>
             <div className="col-md-4">
               <div className="feature-card p-4 text-center">
-                <h4 className="feature-title">Feature 03</h4>
-                <h3>Reforming in the systems</h3>
-                <img src="path-to-feature3-image.jpg" alt="Feature 3" className="img-fluid rounded" />
+                <h4 className="feature-title">Sustainable Growth Strategies</h4>
+                <h3>Explore AI-driven crop rotation plans to improve soil health, increase biodiversity, and double your productivity sustainably.</h3>
+                <img src="/assets/feature3.jpeg" alt="Feature 3" className="img-fluid rounded" />
               </div>
             </div>
           </div>
@@ -54,14 +53,14 @@ const Home = () => {
           <div className="row align-items-center">
             <div className="col-md-6">
               <div className="image-stack">
-                <img src="path-to-large-image.jpg" alt="Large Farm" className="img-fluid large-image rounded" />
-                <img src="path-to-small-image.jpg" alt="Small Farm" className="img-fluid small-image rounded" />
+                <img src="/assets/homeIntroLarge.jpg" alt="Large Farm" className="img-fluid large-image rounded" />
+                <img src="/assets/homeIntroSmall.png" alt="Small Farm" className="img-fluid small-image rounded" />
               </div>
             </div>
             <div className="col-md-6">
               <h4 className="section-subtitle">Our Introduction</h4>
-              <h2>Agriculture & Organic Product Farm</h2>
-              <p>Agrios is the largest global organic farm.</p>
+              <h2>AI-Enhanced Crop Management System</h2>
+              <p>Farming Forward with CropWise.</p>
               <p>
                 There are many variations of passages of lorem ipsum available but the majority have suffered alteration in some form by injected humor or random word which don't look even.
               </p>
@@ -136,7 +135,17 @@ const Home = () => {
       {/* Video Section */}
       <section className="video-section py-5 text-white text-center">
         <h1>Agriculture Matters to the Future of Development</h1>
-        <button className="play-btn">▶</button>
+        <div className="video-container">
+          <iframe
+            width="560"
+            height="315"
+            src="https://www.youtube.com/embed/xFqecEtdGZ0"
+            title="Agriculture Matters Video"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          ></iframe>
+        </div>
       </section>
 
       {/* Projects Section */}
