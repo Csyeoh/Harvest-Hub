@@ -1,7 +1,7 @@
 /* DashboardLayout.css */
 .dashboard-wrapper {
     display: flex;
-    min-height: 100vh; /* Ensure the wrapper takes the full viewport height */
+    min-height: 100%; /* Ensure the wrapper takes the full viewport height */
     margin-top: 60px; /* Account for the fixed top navbar height */
   }
   
