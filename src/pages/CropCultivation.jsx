@@ -1,11 +1,12 @@
 // pages/CropCultivation.jsx
 import React from 'react';
+import ImageUpload from '../components/ImageUpload';
 
 const CropCultivation = () => {
   return (
     <div>
       <h1>Crop Cultivation</h1>
-      <p>Manage your crop cultivation here.</p>
+      <ImageUpload />
     </div>
   );
 };
