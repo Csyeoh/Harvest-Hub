@@ -1,0 +1,75 @@
+.calendar-card {
+  background-color: white;
+  padding: 10px;
+  flex: 1;
+  min-width: 200px;
+  max-width: 100%;
+}
+
+.calendar-card h2 {
+  text-align: center;
+  font-size: 1.2em;
+  margin-bottom: 10px;
+}
+
+.calendar-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 10px;
+  font-size: 0.9em;
+}
+
+.calendar-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  gap: 5px;
+}
+
+.calendar-day {
+  padding: 5px;
+  position: relative;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.day-circle {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #ddd;
+  font-size: 0.9em;
+}
+
+.empty {
+  height: 40px;
+}
+
+.event {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+}
+
+.pesticide {
+  background-color: blue;
+}
+
+.fertilizer {
+  background-color: green;
+}
