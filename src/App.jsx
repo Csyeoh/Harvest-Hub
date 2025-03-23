@@ -1,5 +1,6 @@
 // App.jsx
 import React from 'react';
+
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import MainNavbar from './components/navbar';
 import DashboardLayout from './components/DashboardLayout';
@@ -11,6 +12,7 @@ import Calendar from './pages/Calendar';
 import ChatAssistant from './pages/ChatAssistant';
 import FarmReport from './pages/FarmReport';
 import Settings from './pages/Settings';
+import Footer from './components/footer';
 
 function App() {
   return (
@@ -23,8 +25,9 @@ function App() {
             <>
               <MainNavbar />
               {/* <div style={{ marginTop: '60px' }}> */}
-                <Home />
+              <Home />
               {/* </div> */}
+              <Footer />
             </>
           }
         />
