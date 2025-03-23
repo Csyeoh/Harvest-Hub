@@ -1,0 +1,15 @@
+/* DashboardLayout.css */
+.dashboard-wrapper {
+    display: flex;
+    min-height: 100vh; /* Ensure the wrapper takes the full viewport height */
+    margin-top: 60px; /* Account for the fixed top navbar height */
+  }
+  
+  .content-container {
+    flex-grow: 1; /* Take up the remaining space */
+    margin-left: 250px; /* Account for the fixed sidebar width */
+    padding: 2rem; /* Add padding for better spacing */
+    background-color: #f8f9fa; /* Optional: Light background for content area */
+    min-height: calc(100vh - 60px); /* Ensure content area takes full height minus top navbar */
+    box-sizing: border-box; /* Ensure padding doesn't affect the size */
+  }
