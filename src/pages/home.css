@@ -1,213 +1,213 @@
 /* Home.css */
-.home {
-    font-family: Arial, sans-serif;
-  }
-  
-  /* Hero Section */
-  .hero {
-    height: 100vh;
-    background-image: url('../assets/hero.png'); /* Replace with actual image path */
-    background-size: cover;
-    background-position: center;
-    position: relative;
-  }
-  
-  .hero::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-  }
-  
-  .hero > div {
-    position: relative;
-    z-index: 1;
-  }
-  
-  .welcome-text {
-    font-size: 1.2rem;
-    color: #f1c40f;
-  }
-  
-  .hero-title {
-    font-size: 4rem;
-    font-weight: bold;
-  }
-  
-  .hero-title .highlight {
-    color: #f1c40f;
-  }
-  
-  .hero-description {
-    font-size: 1.1rem;
-    margin: 1rem 0;
-  }
-  
-  /* Features Section */
-  .feature-card {
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  }
-  
-  .feature-title {
-    color: #f1c40f;
-    font-size: 1.2rem;
-  }
-  
-  .feature-card h3 {
-    font-size: 1.5rem;
-    margin: 1rem 0;
-  }
-  
-  .feature-card img {
-    height: 150px;
-    object-fit: cover;
-  }
-  
-  /* Introduction Section */
-  .image-stack {
-    position: relative;
-  }
-  
-  .large-image {
-    width: 100%;
-    height: 400px;
-    object-fit: cover;
-  }
-  
-  .small-image {
-    position: absolute;
-    bottom: -50px;
-    left: 0;
-    width: 200px;
-    height: 200px;
-    object-fit: cover;
-    border: 5px solid white;
-  }
-  
-  .section-subtitle {
-    color: #f1c40f;
-    font-size: 1.2rem;
-    margin-bottom: 1rem;
-  }
-  
-  .introduction h2 {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-  }
-  
-  .introduction p {
-    color: #666;
-  }
-  
-  .icon {
-    font-size: 1.5rem;
-  }
-  
-  /* Services Section */
-  .service-card img {
-    height: 200px;
-    object-fit: cover;
-  }
-  
-  .service-card h3 {
-    font-size: 1.5rem;
-    margin: 1rem 0;
-  }
-  
-  .stats h3 {
-    color: #27ae60;
-    font-size: 1.5rem;
-  }
-  
-  /* Video Section */
-  .video-section {
-    background-color: #2e7d32; /* Green background to match agriculture theme */
-    padding: 5rem 0; /* Matches py-5 */
-  }
-  
-  .video-container {
-    max-width: 560px; /* Matches iframe width */
-    margin: 0 auto; /* Centers the video */
-  }
-  
-  .video-container iframe {
-    width: 100%; /* Makes it responsive */
-    height: auto;
-    aspect-ratio: 16 / 9; /* Maintains video aspect ratio */
-  }
-  
-  /* Projects Section */
-  .project-card img {
-    height: 200px;
-    object-fit: cover;
-  }
-  
-  .project-card h3 {
-    font-size: 1.5rem;
-    margin-top: 1rem;
-  }
-  
-  /* Testimonials Section */
-  .testimonial-card {
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  }
-  
-  .rating {
-    color: #f1c40f;
-  }
-  
-  .status-dot {
-    display: inline-block;
-    width: 10px;
-    height: 10px;
-    background: #27ae60;
-    border-radius: 50%;
-  }
-  
-  /* Reasons Section */
-  .highlight-box {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    background: #f1c40f;
-    padding: 1rem;
-    border-radius: 8px;
-  }
-  
-  .highlight-box h3 {
-    font-size: 1.5rem;
-    color: white;
-  }
-  
-  .check-icon {
-    color: #27ae60;
-    font-size: 1.5rem;
-  }
-  
-  /* News Section */
-  .news-card img {
-    height: 200px;
-    object-fit: cover;
-  }
-  
-  .date {
-    color: #27ae60;
-    font-size: 0.9rem;
-  }
-  
-  .author {
-    color: #666;
-    font-size: 0.9rem;
-  }
-  
-  .news-card h3 {
-    font-size: 1.5rem;
-    margin-top: 0.5rem;
-  }
+.Home {
+  font-family: Arial, sans-serif;
+}
+
+/* Hero Section */
+.homeHero {
+  height: 100vh;
+  background-image: url('../assets/hero.png'); /* Replace with actual image path */
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+.homeHero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.homeHero > div {
+  position: relative;
+  z-index: 1;
+}
+
+.homeWelcomeText {
+  font-size: 1.2rem;
+  color: #f1c40f;
+}
+
+.homeHeroTitle {
+  font-size: 4rem;
+  font-weight: bold;
+}
+
+.homeHeroTitle .homeHighlight {
+  color: #f1c40f;
+}
+
+.homeHeroDescription {
+  font-size: 1.1rem;
+  margin: 1rem 0;
+}
+
+/* Features Section */
+.homeFeatureCard {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.homeFeatureTitle {
+  color: #f1c40f;
+  font-size: 1.2rem;
+}
+
+.homeFeatureCard h3 {
+  font-size: 1.5rem;
+  margin: 1rem 0;
+}
+
+.homeFeatureCard img {
+  height: 150px;
+  object-fit: cover;
+}
+
+/* Introduction Section */
+.homeImageStack {
+  position: relative;
+}
+
+.homeLargeImage {
+  width: 100%;
+  height: 400px;
+  object-fit: cover;
+}
+
+.homeSmallImage {
+  position: absolute;
+  bottom: -50px;
+  left: 0;
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+  border: 5px solid white;
+}
+
+.homeSectionSubtitle {
+  color: #f1c40f;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+.homeIntroduction h2 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.homeIntroduction p {
+  color: #666;
+}
+
+.homeIcon {
+  font-size: 1.5rem;
+}
+
+/* Services Section */
+.homeServiceCard img {
+  height: 200px;
+  object-fit: cover;
+}
+
+.homeServiceCard h3 {
+  font-size: 1.5rem;
+  margin: 1rem 0;
+}
+
+.homeStats h3 {
+  color: #27ae60;
+  font-size: 1.5rem;
+}
+
+/* Video Section */
+.homeVideoSection {
+  background-color: #2e7d32; /* Green background to match agriculture theme */
+  padding: 5rem 0; /* Matches py-5 */
+}
+
+.homeVideoContainer {
+  max-width: 560px; /* Matches iframe width */
+  margin: 0 auto; /* Centers the video */
+}
+
+.homeVideoContainer iframe {
+  width: 100%; /* Makes it responsive */
+  height: auto;
+  aspect-ratio: 16 / 9; /* Maintains video aspect ratio */
+}
+
+/* Projects Section */
+.homeProjectCard img {
+  height: 200px;
+  object-fit: cover;
+}
+
+.homeProjectCard h3 {
+  font-size: 1.5rem;
+  margin-top: 1rem;
+}
+
+/* Testimonials Section */
+.homeTestimonialCard {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.homeRating {
+  color: #f1c40f;
+}
+
+.homeStatusDot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  background: #27ae60;
+  border-radius: 50%;
+}
+
+/* Reasons Section */
+.homeHighlightBox {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: #f1c40f;
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.homeHighlightBox h3 {
+  font-size: 1.5rem;
+  color: white;
+}
+
+.homeCheckIcon {
+  color: #27ae60;
+  font-size: 1.5rem;
+}
+
+/* News Section */
+.homeNewsCard img {
+  height: 200px;
+  object-fit: cover;
+}
+
+.homeDate {
+  color: #27ae60;
+  font-size: 0.9rem;
+}
+
+.homeAuthor {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.homeNewsCard h3 {
+  font-size: 1.5rem;
+  margin-top: 0.5rem;
+}
