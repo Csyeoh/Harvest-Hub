@@ -22,9 +22,9 @@ function App() {
           element={
             <>
               <MainNavbar />
-              <div style={{ marginTop: '60px' }}>
+              {/* <div style={{ marginTop: '60px' }}> */}
                 <Home />
-              </div>
+              {/* </div> */}
             </>
           }
         />
@@ -33,9 +33,9 @@ function App() {
           element={
             <>
               <MainNavbar />
-              <div style={{ marginTop: '60px' }}>
+              {/* <div style={{ marginTop: '60px' }}> */}
                 <About />
-              </div>
+              {/* </div> */}
             </>
           }
         />
