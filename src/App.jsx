@@ -5,7 +5,7 @@ import MainNavbar from './components/navbar';
 import DashboardLayout from './components/DashboardLayout';
 import Home from './pages/home';
 import About from './pages/about';
-import Dashboard from './pages/Dashboard';
+import Dashboard from './pages/dashboard';
 import CropCultivation from './pages/CropCultivation';
 import Calendar from './pages/Calendar';
 import ChatAssistant from './pages/ChatAssistant';

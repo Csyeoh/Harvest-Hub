@@ -1,0 +1,50 @@
+.dashboard-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 100%;
+  }
+  
+  .bottom-row {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  
+  .soil-status {
+    display: flex;
+    gap: 20px;
+    flex: 1;
+    min-width: 250px;
+    max-width: 100%;
+    flex-wrap: wrap;
+  }
+  
+  .soil-card {
+    background-color: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    min-width: 200px;
+  }
+  
+  .soil-card h3 {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+    color: #666;
+  }
+  
+  .status-container p {
+    margin: 5px 0;
+    font-size: 1em;
+    color: #666;
+  }
+
+  .calendar-checkbox {
+    margin-left: 20px;
+  }
