@@ -1,0 +1,111 @@
+/* ChatAssistant.css */
+.chat-assistant-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  
+  .chat-assistant-container h1 {
+    margin-bottom: 1.5rem;
+    color: #343a40;
+  }
+  
+  .chat-box {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    height: calc(100vh - 200px); /* Adjust height to fit within the content container */
+  }
+  
+  .messages {
+    flex-grow: 1;
+    padding: 1.5rem;
+    overflow-y: auto;
+    background-color: #f5f5f5;
+  }
+  
+  .message {
+    display: flex;
+    margin-bottom: 1rem;
+    max-width: 80%;
+  }
+  
+  .user-message {
+    justify-content: flex-end;
+    margin-left: auto;
+  }
+  
+  .assistant-message {
+    justify-content: flex-start;
+    margin-right: auto;
+  }
+  
+  .message-content {
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+  
+  .user-message .message-content {
+    background-color: #007bff;
+    color: #fff;
+  }
+  
+  .assistant-message .message-content {
+    background-color: #e9ecef;
+    color: #343a40;
+  }
+  
+  .chat-input-form {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    background-color: #fff;
+    border-top: 1px solid #dee2e6;
+  }
+  
+  .chat-input {
+    flex-grow: 1;
+    padding: 0.5rem 1rem;
+    border: 1px solid #ced4da;
+    border-radius: 20px;
+    font-size: 1rem;
+    resize: none;
+    outline: none;
+    transition: border-color 0.3s ease;
+  }
+  
+  .chat-input:focus {
+    border-color: #007bff;
+  }
+  
+  .send-button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .send-button:hover {
+    background-color: #0056b3;
+  }
+  
+  .send-button i {
+    font-size: 1.2rem;
+  }
+  
+  /* Ensure Bootstrap Icons are included */
+  @import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css");

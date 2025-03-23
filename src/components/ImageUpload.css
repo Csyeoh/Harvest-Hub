@@ -1,0 +1,97 @@
+/* ImageUpload.css */
+.image-upload-container {
+    margin-top: 1rem;
+  }
+  
+  .dropzone {
+    border: 2px dashed #007bff;
+    border-radius: 8px;
+    padding: 8rem;
+    text-align: center;
+    background-color: #f8f9fa;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .dropzone.drag-active {
+    border-color: #28a745;
+    background-color: #e9ecef;
+  }
+  
+  .dropzone p {
+    margin: 0;
+    color: #6c757d;
+    font-size: 1.1rem;
+  }
+  
+  .image-preview-container {
+    margin-top: 2rem;
+  }
+  
+  .image-preview-container h4 {
+    margin-bottom: 1rem;
+    color: #343a40;
+  }
+  
+  .image-preview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+  }
+  
+  .image-preview {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    overflow: hidden;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .image-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .remove-image-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: #dc3545;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .remove-image-btn:hover {
+    background-color: #c82333;
+  }
+  
+  .submit-button-container {
+    margin-top: 1.5rem;
+    text-align: center;
+  }
+  
+  .submit-button {
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .submit-button:hover {
+    background-color: #218838;
+  }

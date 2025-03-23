@@ -1,0 +1,61 @@
+/* src/App.css */
+.settings-container {
+  background-color: #f5f6fa; /* Light gray background */
+  min-height: 100vh;
+  padding: 20px;
+  display: flex;
+  flex-direction: row; /* Side navbar layout */
+}
+
+.settings-nav {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-right: none; /* Remove right border to stick to content */
+  border-radius: 5px 0 0 5px; /* Rounded corners on left side */
+  display: flex;
+  flex-direction: column; /* Vertical navbar */
+  width: 200px; /* Fixed width for side navbar */
+  min-height: 300px;
+  max-height: 500px;
+}
+
+.settings-nav .nav-link {
+  color: #000; /* Change text color to black */
+  padding: 15px 20px;
+  border-bottom: 1px solid #ddd;
+  font-weight: 500;
+  text-align: center;
+  flex: 1; /* Distribute space equally */
+}
+
+.settings-nav .nav-link:last-child {
+  border-bottom: none;
+}
+
+.settings-nav .nav-link.active {
+  background-color: #e9ecef;
+  color: #007bff; /* Keep active link blue */
+}
+
+.settings-content {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-left: none; /* Remove left border to stick to navbar */
+  border-radius: 0 5px 5px 0; /* Rounded corners on right side */
+  padding: 20px;
+  flex-grow: 1;
+  min-height: 300px; /* Initial shorter height */
+  max-height: 500px; /* Maximum height before scrolling */
+  overflow-y: auto; /* Scroll if content overflows */
+}
+
+.device-list {
+  margin-top: 10px;
+}
+
+/* Ensure navbar and content heights match */
+.settings-wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch; /* Stretch both to match height */
+}

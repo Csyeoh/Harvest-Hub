@@ -5,7 +5,7 @@ import NextHarvest from '../components/NextHarvest';
 import Markets from '../components/Markets';
 import WeatherForecast from '../components/WeatherForecast';
 import SoilStatus from '../components/SoilStatus';
-import '/AcademicUSM/Harvest-Hub/src/App.css'
+import '../App.css'
 
 const Dashboard = () => {
   return (
