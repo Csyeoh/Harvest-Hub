@@ -7,10 +7,10 @@ const Footer = () => {
       <div className="container">
         <div className="row">
           {/* About Column */}
-          <div className="col-md-3">
-            <h3 className="footer-logo">CropWise</h3>
+          <div className="col-md-4">
+            <h3 className="footer-logo">Harvest Hub</h3>
             <p>
-              CropWise is an AI-enhanced crop management system, empowering small-scale farmers with sustainable solutions.
+              Harvest Hub empowers small-scale farmers with AI-driven tools to double yields sustainably, offering crop insights, smart irrigation, harvest predictions, and market trend tracking.
             </p>
             <div className="social-icons">
               <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">
@@ -32,12 +32,11 @@ const Footer = () => {
           <div className="col-md-2">
             <h4>Explore</h4>
             <ul className="footer-links">
-              <li><a href="/about">About</a></li>
-              <li><a href="/services">Services</a></li>
-              <li><a href="/projects">Our Projects</a></li>
-              <li><a href="/farmers">Meet the Farmers</a></li>
-              <li><a href="/news">Latest News</a></li>
-              <li><a href="/contact">Contact</a></li>
+              <li><a href="#home">Home</a></li>
+              <li><a href="#homeIntroduction">About</a></li>
+              <li><a href="#services">Services</a></li>
+              <li><a href="#homeVideoSection">Agriculture Matters</a></li>
+              <li><a href="#reasons">Why Choose Us</a></li>
             </ul>
           </div>
 
@@ -57,14 +56,14 @@ const Footer = () => {
           </div>
 
           {/* Contact Column */}
-          <div className="col-md-4">
+          <div className="col-md-3">
             <h4>Contact</h4>
             <ul className="footer-contact">
               <li>
                 <i className="fas fa-phone-alt"></i> +666 888 0000
               </li>
               <li>
-                <i className="fas fa-envelope"></i> needhelp@cropwise.com
+                <i className="fas fa-envelope"></i> needhelp@harvesthub.com
               </li>
               <li>
                 <i className="fas fa-map-marker-alt"></i> 80 Brooklyn Golden Street Line, New York, USA
@@ -85,7 +84,7 @@ const Footer = () => {
         <div className="container">
           <div className="row">
             <div className="col-md-6">
-              <p>© All Copyright 2025 by CropWise</p>
+              <p>© All Copyright 2025 by Harvest Hub</p>
             </div>
             <div className="col-md-6 text-md-end">
               <a href="/terms">Terms of Use</a>

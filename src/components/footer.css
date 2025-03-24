@@ -1,3 +1,7 @@
+html {
+  scroll-behavior: smooth;
+}
+
 .footer {
     background-color: #1a1a1a; /* Dark background as in the image */
     color: #b0b0b0;

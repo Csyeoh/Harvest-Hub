@@ -71,28 +71,66 @@
 /* Introduction Section */
 .homeImageStack {
   position: relative;
+  width: 100%;
+  height: 450px; /* Fixed height for layout */
+  overflow: visible;
 }
 
 .homeLargeImage {
-  width: 100%;
-  height: 400px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 80%; /* Scales with container width */
+  height: auto; /* Let height follow width */
+  aspect-ratio: 1 / 1; /* Forces 1:1 ratio */
+  max-width: 450px; /* Caps width */
   object-fit: cover;
+  border-radius: 50%;
 }
 
 .homeSmallImage {
   position: absolute;
   bottom: -50px;
   left: 0;
-  width: 200px;
-  height: 200px;
+  width: 50%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  max-width: 300px;
   object-fit: cover;
-  border: 5px solid white;
+  object-position: 65%;
+  border: 15px solid white;
+  border-radius: 50%;
 }
 
-.homeSectionSubtitle {
-  color: #f1c40f;
-  font-size: 1.2rem;
-  margin-bottom: 1rem;
+/* Responsive adjustments */
+@media (max-width: 767px) {
+  .homeImageStack {
+    height: 300px;
+  }
+  .homeLargeImage {
+    width: 60%;
+    max-width: 300px;
+  }
+  .homeSmallImage {
+    width: 40%;
+    max-width: 200px;
+    bottom: -30px;
+  }
+}
+
+@media (max-width: 576px) {
+  .homeImageStack {
+    height: 200px;
+  }
+  .homeLargeImage {
+    width: 50%;
+    max-width: 200px;
+  }
+  .homeSmallImage {
+    width: 30%;
+    max-width: 150px;
+    bottom: -20px;
+  }
 }
 
 .homeIntroduction h2 {
@@ -102,6 +140,11 @@
 
 .homeIntroduction p {
   color: #666;
+}
+
+.homeSectionHighlight {
+  color: #2e7d32;
+  font-weight: bold;
 }
 
 .homeIcon {
@@ -119,10 +162,6 @@
   margin: 1rem 0;
 }
 
-.homeStats h3 {
-  color: #27ae60;
-  font-size: 1.5rem;
-}
 
 /* Video Section */
 .homeVideoSection {
@@ -141,73 +180,39 @@
   aspect-ratio: 16 / 9; /* Maintains video aspect ratio */
 }
 
-/* Projects Section */
-.homeProjectCard img {
-  height: 200px;
-  object-fit: cover;
+/* Ensure the row uses Flexbox to match column heights */
+.equal-height-row {
+  display: flex;
+  flex-wrap: wrap; /* Allows wrapping on smaller screens */
 }
 
-.homeProjectCard h3 {
-  font-size: 1.5rem;
-  margin-top: 1rem;
+/* Make columns stretch to match the tallest one */
+.equal-height-row > .col-md-6 {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Vertically center content if desired */
 }
 
-/* Testimonials Section */
-.homeTestimonialCard {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+/* Style the image column */
+.image-col {
+  padding: 0; /* Remove padding if you want the image flush with edges */
 }
 
-.homeRating {
-  color: #f1c40f;
+/* Ensure the image fills the height while maintaining aspect ratio */
+.image-col img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Crops image to fit container */
+  min-height: 300px; /* Optional: set a minimum height for consistency */
 }
 
-.homeStatusDot {
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  background: #27ae60;
-  border-radius: 50%;
+/* Style the text column for padding and content alignment */
+.text-col {
+  padding: 20px; /* Adjust padding as needed */
 }
 
-/* Reasons Section */
-.homeHighlightBox {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  background: #f1c40f;
-  padding: 1rem;
-  border-radius: 8px;
-}
-
-.homeHighlightBox h3 {
-  font-size: 1.5rem;
-  color: white;
-}
-
-.homeCheckIcon {
-  color: #27ae60;
-  font-size: 1.5rem;
-}
-
-/* News Section */
-.homeNewsCard img {
-  height: 200px;
-  object-fit: cover;
-}
-
-.homeDate {
-  color: #27ae60;
-  font-size: 0.9rem;
-}
-
-.homeAuthor {
-  color: #666;
-  font-size: 0.9rem;
-}
-
-.homeNewsCard h3 {
-  font-size: 1.5rem;
-  margin-top: 0.5rem;
+.discover-more-btn {
+  display: inline-block; /* Prevents full-width stretch */
+  width: 150px; /* Takes only the content’s width */
+  padding: 10px 20px; /* Adjust padding for size */
 }
