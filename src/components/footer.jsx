@@ -8,7 +8,7 @@ const Footer = () => {
         <div className="row">
           {/* About Column */}
           <div className="col-md-4">
-            <h3 className="footer-logo">Harvest Hub</h3>
+            <h3><img src="../hhbot.svg" alt="hhbot" className="profile-img"/> Harvest Hub</h3>
             <p>
               Harvest Hub empowers small-scale farmers with AI-driven tools to double yields sustainably, offering crop insights, smart irrigation, harvest predictions, and market trend tracking.
             </p>
@@ -46,11 +46,11 @@ const Footer = () => {
             <ul className="footer-news">
               <li>
                 <a href="#">Bringing Food Production Back To Cities</a>
-                <span>July 5, 2022</span>
+                <span>July 5, 2024</span>
               </li>
               <li>
                 <a href="#">The Future of Farming, Smart Irrigation Solutions</a>
-                <span>July 5, 2022</span>
+                <span>July 5, 2024</span>
               </li>
             </ul>
           </div>
@@ -60,13 +60,13 @@ const Footer = () => {
             <h4>Contact</h4>
             <ul className="footer-contact">
               <li>
-                <i className="fas fa-phone-alt"></i> +666 888 0000
+                <i className="fas fa-phone-alt"></i> +60 12 345 6789
               </li>
               <li>
-                <i className="fas fa-envelope"></i> needhelp@harvesthub.com
+                <i className="fas fa-envelope"></i> needhelp@harvesthub.com.my
               </li>
               <li>
-                <i className="fas fa-map-marker-alt"></i> 80 Brooklyn Golden Street Line, New York, USA
+                <i className="fas fa-map-marker-alt"></i> 80, Taman Sentosa, Sungai Dua, Gelugor, 11700, Pulau Pinang, MY
               </li>
             </ul>
             <div className="newsletter">
@@ -87,9 +87,9 @@ const Footer = () => {
               <p>© All Copyright 2025 by Harvest Hub</p>
             </div>
             <div className="col-md-6 text-md-end">
-              <a href="/terms">Terms of Use</a>
+              <a href="/">Terms of Use</a>
               <span> | </span>
-              <a href="/privacy">Privacy Policy</a>
+              <a href="/">Privacy Policy</a>
             </div>
           </div>
         </div>

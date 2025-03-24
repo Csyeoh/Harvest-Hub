@@ -15,7 +15,7 @@ const Home = () => {
           <p className="homeHeroDescription">
             Empowering farmers with accessible, scalable AI tools to boost productivity and income while nurturing the planet.
           </p>
-          <button className="btn btn-success">Start Farming Smarter</button>
+          <a className="btn btn-success" href="/login">Start Farming Smarter</a>
         </div>
       </section>
 
