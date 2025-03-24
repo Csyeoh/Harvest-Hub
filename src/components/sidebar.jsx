@@ -14,8 +14,8 @@ const Sidebar = () => {
         className="flex-column h-100 sidebar"
       >
         <Navbar.Brand as={Link} to="/" className="mb-4">
-          <i className="bi bi-tree-fill me-2"></i>
-          Agri Dashboard
+          <img src="../hhbot.svg" alt="hhbot" className="profile-img"/>
+          Harvest Hub
         </Navbar.Brand>
 
         <Nav className="flex-column w-100">
@@ -36,11 +36,11 @@ const Sidebar = () => {
           </NavDropdown>
           
           <NavLink to="/dashboard" className="nav-link mb-2" end>
-            <i className="bi bi-grain me-2"></i>
+            <i className="bi bi-house-door-fill me-2"></i>
             Dashboard
           </NavLink>
           <NavLink to="/dashboard/crop-cultivation" className="nav-link mb-2">
-            <i className="bi bi-grain me-2"></i>
+            <i className="bi bi-search me-2"></i>
             Crop Cultivation
           </NavLink>
           <NavLink to="/dashboard/calendar" className="nav-link mb-2">
