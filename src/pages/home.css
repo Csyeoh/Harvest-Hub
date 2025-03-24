@@ -133,12 +133,6 @@
   }
 }
 
-.homeSectionSubtitle {
-  color: #f1c40f;
-  font-size: 1.2rem;
-  margin-bottom: 1rem;
-}
-
 .homeIntroduction h2 {
   font-size: 2.5rem;
   margin-bottom: 1rem;
@@ -146,6 +140,11 @@
 
 .homeIntroduction p {
   color: #666;
+}
+
+.homeSectionHighlight {
+  color: #2e7d32;
+  font-weight: bold;
 }
 
 .homeIcon {
@@ -181,73 +180,39 @@
   aspect-ratio: 16 / 9; /* Maintains video aspect ratio */
 }
 
-/* Projects Section */
-/* .homeProjectCard img {
-  height: 200px;
-  object-fit: cover;
+/* Ensure the row uses Flexbox to match column heights */
+.equal-height-row {
+  display: flex;
+  flex-wrap: wrap; /* Allows wrapping on smaller screens */
 }
 
-.homeProjectCard h3 {
-  font-size: 1.5rem;
-  margin-top: 1rem;
-} */
-
-/* Testimonials Section */
-/* .homeTestimonialCard {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+/* Make columns stretch to match the tallest one */
+.equal-height-row > .col-md-6 {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Vertically center content if desired */
 }
 
-.homeRating {
-  color: #f1c40f;
+/* Style the image column */
+.image-col {
+  padding: 0; /* Remove padding if you want the image flush with edges */
 }
 
-.homeStatusDot {
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  background: #27ae60;
-  border-radius: 50%;
-} */
-
-/* Reasons Section */
-/* .homeHighlightBox {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  background: #f1c40f;
-  padding: 1rem;
-  border-radius: 8px;
+/* Ensure the image fills the height while maintaining aspect ratio */
+.image-col img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Crops image to fit container */
+  min-height: 300px; /* Optional: set a minimum height for consistency */
 }
 
-.homeHighlightBox h3 {
-  font-size: 1.5rem;
-  color: white;
+/* Style the text column for padding and content alignment */
+.text-col {
+  padding: 20px; /* Adjust padding as needed */
 }
 
-.homeCheckIcon {
-  color: #27ae60;
-  font-size: 1.5rem;
-} */
-
-/* News Section */
-/* .homeNewsCard img {
-  height: 200px;
-  object-fit: cover;
+.discover-more-btn {
+  display: inline-block; /* Prevents full-width stretch */
+  width: 150px; /* Takes only the content’s width */
+  padding: 10px 20px; /* Adjust padding for size */
 }
-
-.homeDate {
-  color: #27ae60;
-  font-size: 0.9rem;
-}
-
-.homeAuthor {
-  color: #666;
-  font-size: 0.9rem;
-}
-
-.homeNewsCard h3 {
-  font-size: 1.5rem;
-  margin-top: 0.5rem;
-} */

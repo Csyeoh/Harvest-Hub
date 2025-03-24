@@ -6,9 +6,9 @@ const Home = () => {
   return (
     <div className="Home">
       {/* Hero Section */}
-      <section className="homeHero text-center text-white d-flex align-items-center justify-content-center">
+      <section id="home" className="homeHero text-center text-white d-flex align-items-center justify-content-center">
         <div>
-          <p className="homeWelcomeText">Welcome to CropWise!</p>
+          <p className="homeWelcomeText">Welcome to Harvest Hub!</p>
           <h1 className="homeHeroTitle">
             Double Your Yield, <span className="homeHighlight">Sustainably</span>
           </h1>
@@ -49,7 +49,7 @@ const Home = () => {
       </section>
 
       {/* Introduction Section */}
-      <section className="homeIntroduction py-5">
+      <section id="homeIntroduction" className="homeIntroduction py-5">
         <div className="container">
           <div className="row align-items-center">
             <div className="col-md-6">
@@ -61,9 +61,9 @@ const Home = () => {
             <div className="col-md-6">
               <h4 className="homeSectionSubtitle">Our Introduction</h4>
               <h2>AI-Enhanced Crop Management System</h2>
-              <p>Farming Forward with CropWise.</p>
+              <p><span className="homeSectionHighlight">Farming Forward with Harvest Hub.</span></p>
               <p>
-                CropWise uses advanced AI to analyze satellite imagery, weather data, and soil sensors, helping small-scale farmers double their productivity sustainably.
+                Harvest Hub uses advanced AI to analyze satellite imagery, weather data, and soil sensors, helping small-scale farmers double their productivity sustainably.
               </p>
               <ul className="list-unstyled">
                 <li className="d-flex align-items-center mb-2">
@@ -83,35 +83,39 @@ const Home = () => {
       </section>
 
       {/* Services Section */}
-      <section className="services py-5 bg-light">
+      <section id="services" className="services py-5 bg-light">
         <div className="container">
           <h2 className="text-center mb-5">What We Offer</h2>
           <div className="row">
             <div className="col-md-3">
               <div className="homeServiceCard text-center">
-                <img src="/assets/service1.png" alt="Service 1" className="img-fluid rounded" />
-                <h3>Crop Monitoring</h3>
+                <img src="/assets/service1.png" alt="Crop Insights" className="img-fluid rounded" />
+                <h3>AI Crop Insights</h3>
+                <p>Monitor crop health with AI, analyzing satellite imagery and soil data to predict risks.</p>
                 <button className="btn btn-success">Read More</button>
               </div>
             </div>
             <div className="col-md-3">
               <div className="homeServiceCard text-center">
-                <img src="path-to-service2-image.jpg" alt="Service 2" className="img-fluid rounded" />
+                <img src="/assets/service2.jpg" alt="Smart Irrigation" className="img-fluid rounded" />
                 <h3>Smart Irrigation</h3>
+                <p>Optimize water use with data-driven recommendations and notification alerts.</p>
                 <button className="btn btn-success">Read More</button>
               </div>
             </div>
             <div className="col-md-3">
               <div className="homeServiceCard text-center">
-                <img src="path-to-service3-image.jpg" alt="Service 3" className="img-fluid rounded" />
-                <h3>Soil Health</h3>
+                <img src="/assets/service3.jpeg" alt="Harvest Prediction" className="img-fluid rounded" />
+                <h3>Harvest Prediction</h3>
+                <p>Predict your next harvest with precision using our AI-powered companion.</p>
                 <button className="btn btn-success">Read More</button>
               </div>
             </div>
             <div className="col-md-3">
               <div className="homeServiceCard text-center">
-                <img src="path-to-service4-image.jpg" alt="Service 4" className="img-fluid rounded" />
-                <h3>Pest Alerts</h3>
+                <img src="/assets/service4.jpg" alt="Market Trends" className="img-fluid rounded" />
+                <h3>Market Trends</h3>
+                <p>Track daily price trends to maximize profits with real-time AI advice.</p>
                 <button className="btn btn-success">Read More</button>
               </div>
             </div>
@@ -120,7 +124,7 @@ const Home = () => {
       </section>
 
       {/* Video Section */}
-      <section className="homeVideoSection py-5 text-white text-center">
+      <section id="homeVideoSection" className="homeVideoSection py-5 text-white text-center">
         <h1>Agriculture Matters to the Future of Development</h1>
         <div className="homeVideoContainer">
           <iframe
@@ -135,123 +139,37 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Projects Section */}
-      {/* <section className="projects py-5">
-        <div className="container">
-          <h4 className="homeSectionSubtitle text-center">Recently Completed</h4>
-          <h2 className="text-center mb-5">Explore Projects</h2>
-          <div className="row">
-            <div className="col-md-4">
-              <div className="homeProjectCard">
-                <img src="path-to-project1-image.jpg" alt="Project 1" className="img-fluid rounded" />
-                <h3>Smart Harvesting</h3>
-              </div>
-            </div>
-            <div className="col-md-4">
-              <div className="homeProjectCard">
-                <img src="path-to-project2-image.jpg" alt="Project 2" className="img-fluid rounded" />
-                <h3>AI Farming</h3>
-              </div>
-            </div>
-            <div className="col-md-4">
-              <div className="homeProjectCard">
-                <img src="path-to-project3-image.jpg" alt="Project 3" className="img-fluid rounded" />
-                <h3>Sustainable Solutions</h3>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section> */}
-
-      {/* Testimonials Section */}
-      {/* <section className="testimonials py-5 bg-light">
-        <div className="container">
-          <h4 className="homeSectionSubtitle">Our Testimonials</h4>
-          <h2>What Farmers Say About CropWise</h2>
-          <div className="row align-items-center">
-            <div className="col-md-8">
-              <p>
-                "CropWise has transformed my farm with AI insights and smart irrigation, doubling my yield sustainably!"
-              </p>
-            </div>
-            <div className="col-md-4 text-center">
-              <div className="homeTestimonialCard p-4">
-                <h5>Bonnie Tolbert</h5>
-                <div className="homeRating">★★★★★</div>
-                <span className="homeStatusDot"></span>
-              </div>
-            </div>
-          </div>
-          <button className="btn btn-success mt-3">View All Testimonials</button>
-        </div>
-      </section> */}
-
       {/* Reasons Section */}
-      <section className="reasons py-5">
+      <section id="reasons" className="reasons py-5">
         <div className="container">
-          <h4 className="homeSectionSubtitle">Our Farm Benefits</h4>
-          <h2>Why Choose CropWise</h2>
-          <div className="row align-items-center">
-            <div className="col-md-6">
-              <img src="path-to-reasons-image.jpg" alt="Reasons" className="img-fluid rounded" />
-              {/* <div className="homeHighlightBox">
-                <h3>AI-Powered Farming Leader</h3>
-              </div> */}
+          <div className="row align-items-center equal-height-row">
+            <div className="col-md-6 image-col">
+              <img src="/assets/reasons.jpg" alt="Reasons" className="img-fluid rounded" />
             </div>
-            <div className="col-md-6">
+            <div className="col-md-6 text-col">
+              <h2>Why Choose Harvest Hub</h2>
               <p>
-                CropWise uses AI to provide actionable insights, helping small-scale farmers thrive sustainably.
+                Harvest Hub empowers small-scale farmers with AI tools to double yields, boost income, and farm sustainably.
               </p>
               <ul className="list-unstyled">
                 <li className="d-flex align-items-center mb-3">
-                  <span className="homeCheckIcon me-2">✔</span> Advanced Crop Monitoring
+                  <span className="homeCheckIcon me-2">✔</span> AI-Powered Crop Insights
                 </li>
                 <li className="d-flex align-items-center mb-3">
-                  <span className="homeCheckIcon me-2">✔</span> Smart Irrigation Solutions
+                  <span className="homeCheckIcon me-2">✔</span> Smart Irrigation Alerts
+                </li>
+                <li className="d-flex align-items-center mb-3">
+                  <span className="homeCheckIcon me-2">✔</span> Harvest & Market Predictions
                 </li>
                 <li className="d-flex align-items-center">
-                  <span className="homeCheckIcon me-2">✔</span> Sustainable Practices
+                  <span className="homeCheckIcon me-2">✔</span> Sustainable Farming
                 </li>
               </ul>
-              <button className="btn btn-success">Discover More</button>
+              <button className="btn btn-success discover-more-btn">Discover More</button>
             </div>
           </div>
         </div>
       </section>
-
-      {/* News Section */}
-      {/* <section className="news py-5 bg-light">
-        <div className="container">
-          <h4 className="homeSectionSubtitle text-center">From The Blog</h4>
-          <h2 className="text-center mb-5">News & Articles</h2>
-          <div className="row">
-            <div className="col-md-4">
-              <div className="homeNewsCard">
-                <img src="path-to-news1-image.jpg" alt="News 1" className="img-fluid rounded" />
-                <p className="homeDate">05 July 2022</p>
-                <p className="homeAuthor">By Kevin Martin • 1 Comment</p>
-                <h3>Bringing Food Production Back To Cities</h3>
-              </div>
-            </div>
-            <div className="col-md-4">
-              <div className="homeNewsCard">
-                <img src="path-to-news2-image.jpg" alt="News 2" className="img-fluid rounded" />
-                <p className="homeDate">05 July 2022</p>
-                <p className="homeAuthor">By Kevin Martin • 1 Comment</p>
-                <h3>The Future of Farming, Smart Irrigation Solutions</h3>
-              </div>
-            </div>
-            <div className="col-md-4">
-              <div className="homeNewsCard">
-                <img src="path-to-news3-image.jpg" alt="News 3" className="img-fluid rounded" />
-                <p className="homeDate">05 July 2022</p>
-                <p className="homeAuthor">By Kevin Martin • 0 Comments</p>
-                <h3>Agronomy and Relation to Other Sciences</h3>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section> */}
     </div>
   );
 };
