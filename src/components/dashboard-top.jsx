@@ -60,7 +60,7 @@ const TopNavbar = () => {
               variant="link"
             >
               <img 
-                src="./vite.svg"
+                src='../hhbot.svg'
                 alt="Profile" 
                 className="profile-img"
               />

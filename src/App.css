@@ -63,6 +63,11 @@
     text-align: left;
   }
 
+  /* .harvest-card-d {
+    display: flex;
+    justify-content: space-between;
+  } */
+
   .harvest-card td{
     vertical-align: top;
   }
@@ -70,7 +75,7 @@
   .progress-circle {
     width: 100px;
     height: 100px;
-    background: conic-gradient(#FFD700 0% 88%, #ddd 88% 100%);
+    background: conic-gradient(#FFD700 0% 30%, #ddd 30% 100%);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -203,14 +208,14 @@
     flex-wrap: wrap; /* Allow wrapping if needed */
   }
   
-  .soil-card {
+  .soil-card-d {
     background-color: white;
     padding: 15px;
     border-radius: 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     flex: 1;
     display: flex;
-    align-items: center;
+    align-items: center !important;
     gap: 10px;
     min-width: 200px;
   }

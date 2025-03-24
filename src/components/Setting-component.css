@@ -1,7 +1,7 @@
 /* src/App.css */
 .settings-container {
   background-color: #f5f6fa; /* Light gray background */
-  min-height: 100vh;
+  min-height: 100%;
   padding: 20px;
   display: flex;
   flex-direction: row; /* Side navbar layout */
