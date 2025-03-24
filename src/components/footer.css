@@ -1,0 +1,149 @@
+.footer {
+    background-color: #1a1a1a; /* Dark background as in the image */
+    color: #b0b0b0;
+    padding: 3rem 0 0;
+    font-family: Arial, sans-serif;
+  }
+  
+  .footer-logo {
+    color: white;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+  }
+  
+  .footer-logo::before {
+    content: "🌱 "; /* Adding a small icon before the logo */
+  }
+  
+  .footer p {
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+  
+  .social-icons {
+    margin-top: 1rem;
+  }
+  
+  .social-icons a {
+    color: #b0b0b0;
+    margin-right: 1rem;
+    font-size: 1.2rem;
+    transition: color 0.3s ease;
+  }
+  
+  .social-icons a:hover {
+    color: #2e7d32; /* Green hover effect */
+  }
+  
+  .footer h4 {
+    color: white;
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+  }
+  
+  .footer h4::after {
+    content: "";
+    display: block;
+    width: 30px;
+    height: 2px;
+    background-color: #2e7d32; /* Green underline */
+    position: absolute;
+    left: 0;
+    bottom: -5px;
+  }
+  
+  .footer-links,
+  .footer-news,
+  .footer-contact {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .footer-links li,
+  .footer-news li,
+  .footer-contact li {
+    margin-bottom: 0.75rem;
+  }
+  
+  .footer-links a,
+  .footer-news a {
+    color: #b0b0b0;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.3s ease;
+  }
+  
+  .footer-links a:hover,
+  .footer-news a:hover {
+    color: #2e7d32;
+  }
+  
+  .footer-news span {
+    display: block;
+    font-size: 0.8rem;
+    color: #666;
+  }
+  
+  .footer-contact li {
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+  }
+  
+  .footer-contact i {
+    color: #2e7d32;
+    margin-right: 0.75rem;
+  }
+  
+  .newsletter {
+    display: flex;
+    margin-top: 1rem;
+  }
+  
+  .newsletter input {
+    flex: 1;
+    padding: 0.5rem;
+    border: none;
+    border-radius: 5px 0 0 5px;
+    font-size: 0.9rem;
+  }
+  
+  .newsletter .btn {
+    background-color: #2e7d32;
+    border: none;
+    border-radius: 0 5px 5px 0;
+    padding: 0 1rem;
+    display: flex;
+    align-items: center;
+  }
+  
+  .newsletter .btn i {
+    color: white;
+  }
+  
+  .footer-bottom {
+    border-top: 1px solid #333;
+    margin-top: 2rem;
+    padding: 1rem 0;
+    font-size: 0.85rem;
+  }
+  
+  .footer-bottom p {
+    margin: 0;
+  }
+  
+  .footer-bottom a {
+    color: #b0b0b0;
+    text-decoration: none;
+    margin: 0 0.5rem;
+  }
+  
+  .footer-bottom a:hover {
+    color: #2e7d32;
+  }
+  
+  .footer-bottom span {
+    color: #666;
+  }
