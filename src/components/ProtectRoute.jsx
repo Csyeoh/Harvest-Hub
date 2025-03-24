@@ -21,7 +21,7 @@ const ProtectedRoute = ({ children }) => {
     return <div>Loading...</div>; // Or a loading spinner
   }
 
-  return user ? children : <Navigate to="/login" />;
+  return user ? children : <Navigate to="/" />;
 };
 
 export default ProtectedRoute;
