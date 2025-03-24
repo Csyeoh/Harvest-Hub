@@ -1,14 +1,11 @@
 import React from 'react';
 import './CalendarComp.css';
 
-function CalendarComp({ month, year, events }) {
-  // Get the number of days in the given month
+function CalendarComp({ month, year, events, images, onDayClick }) {
   const daysInMonth = new Date(year, month + 1, 0).getDate();
-  // Get the first day of the month (0 = Sunday, 6 = Saturday)
   const firstDay = new Date(year, month, 1).getDay();
   const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
 
-  // Month names for display
   const monthNames = [
     'January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December'
@@ -31,13 +28,29 @@ function CalendarComp({ month, year, events }) {
           <span key={`empty-${i}`} className="empty"></span>
         ))}
         {days.map((day) => (
-          <span key={day} className="calendar-day">
+          <span
+            key={day}
+            className="calendar-day"
+            onClick={() => onDayClick(day)}
+            style={{ cursor: 'pointer' }}
+          >
             <span className="day-circle">{day}</span>
-            {events[day] && (
-              <span className={`event ${events[day] === 'P' ? 'pesticide' : 'fertilizer'}`}>
-                {events[day]}
-              </span>
-            )}
+            <div className="markers">
+              {images[day] && <span className="image-marker"></span>}
+              {events[day] && (
+                <span
+                  className={`event ${
+                    events[day] === 'P'
+                      ? 'pesticide'
+                      : events[day] === 'F'
+                      ? 'fertilizer'
+                      : 'both'
+                  }`}
+                >
+                  {events[day]}
+                </span>
+              )}
+            </div>
           </span>
         ))}
       </div>
