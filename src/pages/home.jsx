@@ -39,9 +39,9 @@ const Home = () => {
             </div>
             <div className="col-md-4">
               <div className="homeFeatureCard p-4 text-center">
-                <h4 className="homeFeatureTitle">Sustainable Growth Strategies</h4>
-                <h3>Explore AI-driven crop rotation plans to improve soil health, increase biodiversity, and double your productivity sustainably.</h3>
-                <img src="/assets/feature3.jpeg" alt="Feature 3" className="img-fluid rounded" />
+                <h4 className="homeFeatureTitle">Farm Success Companion</h4>
+                <h3>Chat with our AI assistant for real-time advice, predict your next harvest with precision, and track daily price trends to maximize profits.</h3>
+                <img src="/assets/feature3.jpg" alt="Feature 3" className="img-fluid rounded" />
               </div>
             </div>
           </div>
@@ -54,8 +54,8 @@ const Home = () => {
           <div className="row align-items-center">
             <div className="col-md-6">
               <div className="homeImageStack">
-                <img src="/assets/homeIntroLarge.jpg" alt="Large Farm" className="img-fluid homeLargeImage rounded" />
-                <img src="/assets/homeIntroSmall.png" alt="Small Farm" className="img-fluid homeSmallImage rounded" />
+                <img src="/assets/homeIntroLarge.jpg" alt="Large Farm" className="img-fluid homeLargeImage" />
+                <img src="/assets/homeIntroSmall.jpg" alt="Small Farm" className="img-fluid homeSmallImage" />
               </div>
             </div>
             <div className="col-md-6">
@@ -73,7 +73,7 @@ const Home = () => {
                   <span className="homeIcon me-2">💧</span> Optimize irrigation with smart alerts
                 </li>
                 <li className="d-flex align-items-center">
-                  <span className="homeIcon me-2">♻️</span> Sustainably increase yields
+                  <span className="homeIcon me-2">🤖</span> Chat, Predict, Profit
                 </li>
               </ul>
               <button className="btn btn-success">Discover More</button>
@@ -89,7 +89,7 @@ const Home = () => {
           <div className="row">
             <div className="col-md-3">
               <div className="homeServiceCard text-center">
-                <img src="path-to-service1-image.jpg" alt="Service 1" className="img-fluid rounded" />
+                <img src="/assets/service1.png" alt="Service 1" className="img-fluid rounded" />
                 <h3>Crop Monitoring</h3>
                 <button className="btn btn-success">Read More</button>
               </div>
@@ -116,20 +116,6 @@ const Home = () => {
               </div>
             </div>
           </div>
-          <div className="homeStats row text-center mt-5">
-            <div className="col-md-3">
-              <h3>AI Insights</h3>
-            </div>
-            <div className="col-md-3">
-              <h3>Projects Completed</h3>
-            </div>
-            <div className="col-md-3">
-              <h3>Satisfied Farmers</h3>
-            </div>
-            <div className="col-md-3">
-              <h3>Expert Support</h3>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -150,7 +136,7 @@ const Home = () => {
       </section>
 
       {/* Projects Section */}
-      <section className="projects py-5">
+      {/* <section className="projects py-5">
         <div className="container">
           <h4 className="homeSectionSubtitle text-center">Recently Completed</h4>
           <h2 className="text-center mb-5">Explore Projects</h2>
@@ -175,10 +161,10 @@ const Home = () => {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Testimonials Section */}
-      <section className="testimonials py-5 bg-light">
+      {/* <section className="testimonials py-5 bg-light">
         <div className="container">
           <h4 className="homeSectionSubtitle">Our Testimonials</h4>
           <h2>What Farmers Say About CropWise</h2>
@@ -198,7 +184,7 @@ const Home = () => {
           </div>
           <button className="btn btn-success mt-3">View All Testimonials</button>
         </div>
-      </section>
+      </section> */}
 
       {/* Reasons Section */}
       <section className="reasons py-5">
@@ -234,7 +220,7 @@ const Home = () => {
       </section>
 
       {/* News Section */}
-      <section className="news py-5 bg-light">
+      {/* <section className="news py-5 bg-light">
         <div className="container">
           <h4 className="homeSectionSubtitle text-center">From The Blog</h4>
           <h2 className="text-center mb-5">News & Articles</h2>
@@ -265,7 +251,7 @@ const Home = () => {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
     </div>
   );
 };
