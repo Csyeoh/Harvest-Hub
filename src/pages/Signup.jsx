@@ -1,50 +1,101 @@
-import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { IoPersonOutline, IoMailOutline, IoLockClosedOutline, IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
+import { auth } from "../components/firebase";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { updateProfile } from "firebase/auth";
+import "./Signup.css";
 
 const Signup = () => {
-  const navigation = useNavigation();
+  const navigate = useNavigate();
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSignup = async (e) => {
+    e.preventDefault();
+    setError("");
+    if (password !== confirmPassword) {
+      setError("Passwords do not match!");
+      return;
+    }
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      await updateProfile(userCredential.user, { displayName: username });
+      console.log("Signup successful with:", { username, email });
+      navigate("/login");
+    } catch (err) {
+      setError(err.message);
+      console.error("Signup failed:", err);
+    }
+  };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Sign Up for Harvest Hub</Text>
-      <Text style={styles.text}>This is a placeholder signup screen.</Text>
+    <div className="auth-container">
+      <img src="https://via.placeholder.com/150" alt="Harvest Hub Logo" className="auth-logo" />
+      <h2 className="auth-title">Sign Up for Harvest Hub</h2>
 
-      <TouchableOpacity onPress={() => navigation.navigate("Login")} style={styles.backButton}>
-        <Text style={styles.backText}>Back to Login</Text>
-      </TouchableOpacity>
-    </View>
+      {error && <p className="auth-errorText">{error}</p>}
+
+      <div className="auth-inputContainer">
+        <IoPersonOutline size={20} color="#888" className="auth-icon" />
+        <input
+          className="auth-input"
+          type="text"
+          placeholder="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
+      </div>
+
+      <div className="auth-inputContainer">
+        <IoMailOutline size={20} color="#888" className="auth-icon" />
+        <input
+          className="auth-input"
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+      </div>
+
+      <div className="auth-inputContainer">
+        <IoLockClosedOutline size={20} color="#888" className="auth-icon" />
+        <input
+          className="auth-input"
+          type={showPassword ? "text" : "password"}
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+      </div>
+
+      <div className="auth-inputContainer">
+        <IoLockClosedOutline size={20} color="#888" className="auth-icon" />
+        <input
+          className="auth-input"
+          type={showPassword ? "text" : "password"}
+          placeholder="Confirm Password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+        />
+        <button onClick={() => setShowPassword(!showPassword)} className="auth-iconButton">
+          {showPassword ? <IoEyeOffOutline size={20} color="#888" /> : <IoEyeOutline size={20} color="#888" />}
+        </button>
+      </div>
+
+      <button className="auth-actionButton" onClick={handleSignup}>
+        Sign Up
+      </button>
+
+      <p className="auth-navText" onClick={() => navigate("/login")}>
+        Already have an account? Login
+      </p>
+    </div>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#f5f5f5",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 10,
-    color: "#4CAF50",
-  },
-  text: {
-    fontSize: 16,
-    marginBottom: 20,
-    textAlign: "center",
-  },
-  backButton: {
-    backgroundColor: "#4CAF50",
-    padding: 15,
-    borderRadius: 10,
-    marginTop: 20,
-  },
-  backText: {
-    color: "#fff",
-    fontSize: 18,
-  },
-});
 
 export default Signup;
