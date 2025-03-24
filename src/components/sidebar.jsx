@@ -14,8 +14,8 @@ const Sidebar = () => {
         className="flex-column h-100 sidebar"
       >
         <Navbar.Brand as={Link} to="/" className="mb-4">
-          <i className="bi bi-tree-fill me-2"></i>
-          Agri Dashboard
+          <img src="../hhbot.svg" alt="hhbot" className="profile-img"/>
+          Harvest Hub
         </Navbar.Brand>
 
         <Nav className="flex-column w-100">
