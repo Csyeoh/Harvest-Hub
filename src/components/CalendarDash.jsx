@@ -19,32 +19,32 @@ function CalendarDash() {
   }, [dailyData, currentYear, currentMonth]);
 
   const handlePrevMonth = () => {
-    setCurrentMonth(prev => {
-      if (prev === 0) {
-        setCurrentYear(year => year - 1);
-        return 11;
-      }
-      return prev - 1;
-    });
-    setDailyData(() => {
-      const savedData = localStorage.getItem(`dailyData_${currentYear}_${currentMonth - 1}`);
-      return savedData ? JSON.parse(savedData) : {};
-    });
+    if (currentMonth === 0) {
+      setCurrentYear(prevYear => prevYear - 1);
+      setCurrentMonth(11); // December of the previous year
+    } else {
+      setCurrentMonth(prevMonth => prevMonth - 1);
+    }
+    // Load data for the new month
+    const newYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+    const newMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+    const savedData = localStorage.getItem(`dailyData_${newYear}_${newMonth}`);
+    setDailyData(savedData ? JSON.parse(savedData) : {});
     setSelectedDay(null);
   };
 
   const handleNextMonth = () => {
-    setCurrentMonth(prev => {
-      if (prev === 11) {
-        setCurrentYear(year => year + 1);
-        return 0;
-      }
-      return prev + 1;
-    });
-    setDailyData(() => {
-      const savedData = localStorage.getItem(`dailyData_${currentYear}_${currentMonth + 1}`);
-      return savedData ? JSON.parse(savedData) : {};
-    });
+    if (currentMonth === 11) {
+      setCurrentYear(prevYear => prevYear + 1);
+      setCurrentMonth(0); // January of the next year
+    } else {
+      setCurrentMonth(prevMonth => prevMonth + 1);
+    }
+    // Load data for the new month
+    const newYear = currentMonth === 11 ? currentYear + 1 : currentYear;
+    const newMonth = currentMonth === 11 ? 0 : currentMonth + 1;
+    const savedData = localStorage.getItem(`dailyData_${newYear}_${newMonth}`);
+    setDailyData(savedData ? JSON.parse(savedData) : {});
     setSelectedDay(null);
   };
 
@@ -102,7 +102,6 @@ function CalendarDash() {
     }));
   };
 
-  // Events for pesticide/fertilizer
   const events = Object.keys(dailyData).reduce((acc, day) => {
     const data = dailyData[day];
     let marker = '';
@@ -117,7 +116,6 @@ function CalendarDash() {
     return acc;
   }, {});
 
-  // Images indicator
   const images = Object.keys(dailyData).reduce((acc, day) => {
     if (dailyData[day].image) acc[day] = true;
     return acc;
@@ -139,7 +137,7 @@ function CalendarDash() {
           month={currentMonth}
           year={currentYear}
           events={events}
-          images={images} // Pass images to CalendarComp
+          images={images}
           onDayClick={setSelectedDay}
         />
         <div className="soil-status">

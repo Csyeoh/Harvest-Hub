@@ -1,4 +1,3 @@
-// TopNavbar.jsx
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Navbar, Nav, Form, FormControl, Dropdown } from 'react-bootstrap';
@@ -52,6 +51,42 @@ const TopNavbar = () => {
             </Dropdown.Menu>
           </Dropdown>
 
+          {/* Translation Button with Dropdown */}
+          <Dropdown className="mx-3 translation-dropdown">
+            <Dropdown.Toggle 
+              as={Nav.Link} 
+              className="p-0 translation-toggle"
+              variant="link"
+            >
+              {/* Use a Bootstrap Icon or your custom image */}
+              {/* Option 1: Using Bootstrap Icon */}
+              <i className="bi bi-globe"></i>
+
+              {/* Option 2: Using Custom Image (uncomment to use) */}
+              
+              {/* <img 
+                src="../translate.svg" 
+                alt="Translation" 
+                className="translation-img"
+              /> */}
+             
+            </Dropdown.Toggle>
+
+            <Dropdown.Menu align="end" className="mt-2 translation-menu">
+              <Dropdown.ItemText>Select Language</Dropdown.ItemText>
+              <Dropdown.Divider />
+              <Dropdown.Item onClick={() => console.log('Selected English')}>
+                English
+              </Dropdown.Item>
+              <Dropdown.Item onClick={() => console.log('Selected Spanish')}>
+                Spanish
+              </Dropdown.Item>
+              <Dropdown.Item onClick={() => console.log('Selected French')}>
+                French
+              </Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
+
           {/* Profile Dropdown with Image */}
           <Dropdown align="end" className="mx-3">
             <Dropdown.Toggle 
@@ -60,7 +95,7 @@ const TopNavbar = () => {
               variant="link"
             >
               <img 
-                src='../hhbot.svg'
+                src="../hhbot.svg"
                 alt="Profile" 
                 className="profile-img"
               />
