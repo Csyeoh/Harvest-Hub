@@ -1,9 +1,24 @@
-import React from 'react';
+import React from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Navbar, Nav, Form, FormControl, Dropdown } from 'react-bootstrap';
+import { Link, useNavigate } from "react-router-dom";
+import { auth } from "./firebase"; // Adjust path if needed
+import { signOut} from "firebase/auth";
 import './dashboard-top.css';
 
 const TopNavbar = () => {
+  const navigate = useNavigate();
+
+  // Handle logout
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      console.log("Logout successful");
+      navigate("/");
+    } catch (err) {
+      console.error("Logout failed:", err);
+    }
+  };
   return (
     <Navbar bg="dark" variant="dark" fixed="top" className="top-navbar">
       <div className="container-fluid justify-content-center">
@@ -103,9 +118,9 @@ const TopNavbar = () => {
 
             <Dropdown.Menu className="mt-2">
               <Dropdown.Item href="#profile">Profile</Dropdown.Item>
-              <Dropdown.Item href="#settings">Settings</Dropdown.Item>
+              <Dropdown.Item href="/dashboard/settings">Settings</Dropdown.Item>
               <Dropdown.Divider />
-              <Dropdown.Item href="#logout">Logout</Dropdown.Item>
+              <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
         </Nav>

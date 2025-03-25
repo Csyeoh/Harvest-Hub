@@ -13,8 +13,9 @@ import ChatAssistant from './pages/ChatAssistant';
 import FarmReport from './pages/FarmReport';
 import Settings from './pages/Settings';
 import Footer from './components/footer';
-// import Login from './pages/Login';
-// import Signup from './pages/Signup';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+import ProtectedRoute from './components/ProtectRoute';
 
 function App() {
   return (
@@ -44,10 +45,13 @@ function App() {
             </>
           }
         />
-        {/* <Route path="login" element={<Login />} /> 
-        <Route path="signup" element={<Signup />} />  */}
+        <Route path="/login" element={<Login />} /> 
+        <Route path="/signup" element={<Signup />} /> 
         {/* Dashboard Routes with Sidebar and TopNavbar */}
-        <Route path="/dashboard/*" element={<DashboardLayout />}>
+        <Route path="/dashboard/*" element={
+          <ProtectedRoute>
+            <DashboardLayout />
+          </ProtectedRoute>}>
           <Route index element={<Dashboard />} /> {/* /dashboard */}
           <Route path="crop-cultivation" element={<CropCultivation />} /> {/* /dashboard/crop-cultivation */}
           <Route path="calendar" element={<Calendar />} /> {/* /dashboard/calendar */}

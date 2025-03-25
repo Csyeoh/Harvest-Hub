@@ -1,8 +1,17 @@
-import React from 'react';
+import React, { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import './Home.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const Home = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.state?.showLoginMessage) {
+      alert("Please log in to access the dashboard."); // Simple alert
+      // Alternatively, you can set state to show a message in the UI
+    }
+  }, [location]);
   return (
     <div className="Home">
       {/* Hero Section */}
@@ -15,7 +24,7 @@ const Home = () => {
           <p className="homeHeroDescription">
             Empowering farmers with accessible, scalable AI tools to boost productivity and income while nurturing the planet.
           </p>
-          <button className="btn btn-success">Start Farming Smarter</button>
+          <a className="btn btn-success" href="/login">Start Farming Smarter</a>
         </div>
       </section>
 

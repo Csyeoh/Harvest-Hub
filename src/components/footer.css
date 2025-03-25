@@ -16,10 +16,6 @@ html {
     margin-bottom: 1rem;
   }
   
-  .footer-logo::before {
-    content: "🌱 "; /* Adding a small icon before the logo */
-  }
-  
   .footer p {
     font-size: 0.9rem;
     line-height: 1.6;
