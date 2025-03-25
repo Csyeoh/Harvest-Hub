@@ -223,22 +223,10 @@ function Report() {
                 required
               />
             </div>
-            <div className="form-group">
-              <label>Upload Plant Picture:</label>
-              <input type="file" accept="image/*" onChange={handleImageUpload} />
-              {plantImage && (
-                <img
-                  src={URL.createObjectURL(plantImage)}
-                  alt="Plant Preview"
-                  style={{ maxWidth: '200px', marginTop: '10px' }}
-                />
-              )}
-            </div>
             <button type="submit">Generate Report</button>
           </form>
         </div>
 
-        {/* Report Display Section */}
         {report && (
           <div className="report-display" ref={reportRef}>
             <h2>FARM REPORT</h2>
