@@ -1,11 +1,22 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 const Markets = () => {
+  const [selectedPlant, setSelectedPlant] = useState('Cauliflower'); // Default to Cauliflower
+
+  // Fetch the selected plant profile from localStorage
+  useEffect(() => {
+    const profile = localStorage.getItem('selectedPlantProfile');
+    if (profile) {
+      const parsedProfile = JSON.parse(profile);
+      setSelectedPlant(parsedProfile.name !== 'Select Plant Profile' ? parsedProfile.name : 'Cauliflower');
+    }
+  }, []);
+
   return (
     <div className="markets-card">
       <h3>Current Price</h3>
       <div className="market-item">
-        <p>Cauliflower</p>
+        <p>{selectedPlant}</p>
         <p className="">RM/kg</p>
       </div>
       <div className="market-item">

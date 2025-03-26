@@ -21,11 +21,10 @@ function CalendarDash() {
   const handlePrevMonth = () => {
     if (currentMonth === 0) {
       setCurrentYear(prevYear => prevYear - 1);
-      setCurrentMonth(11); // December of the previous year
+      setCurrentMonth(11);
     } else {
       setCurrentMonth(prevMonth => prevMonth - 1);
     }
-    // Load data for the new month
     const newYear = currentMonth === 0 ? currentYear - 1 : currentYear;
     const newMonth = currentMonth === 0 ? 11 : currentMonth - 1;
     const savedData = localStorage.getItem(`dailyData_${newYear}_${newMonth}`);
@@ -36,11 +35,10 @@ function CalendarDash() {
   const handleNextMonth = () => {
     if (currentMonth === 11) {
       setCurrentYear(prevYear => prevYear + 1);
-      setCurrentMonth(0); // January of the next year
+      setCurrentMonth(0);
     } else {
       setCurrentMonth(prevMonth => prevMonth + 1);
     }
-    // Load data for the new month
     const newYear = currentMonth === 11 ? currentYear + 1 : currentYear;
     const newMonth = currentMonth === 11 ? 0 : currentMonth + 1;
     const savedData = localStorage.getItem(`dailyData_${newYear}_${newMonth}`);
@@ -58,7 +56,7 @@ function CalendarDash() {
           ...prev,
           [selectedDay]: {
             ...prev[selectedDay],
-            image: reader.result,
+            image: reader.result, // Store Base64 string in localStorage
           },
         }));
       };
@@ -83,7 +81,10 @@ function CalendarDash() {
     setDailyData(prev => {
       const updatedDay = { ...prev[selectedDay] };
       updatedDay[type] = checked;
-      if (!checked) delete updatedDay[`${type}Type`];
+      if (!checked) {
+        delete updatedDay[`${type}Type`];
+        delete updatedDay[`${type}Amount`];
+      }
       return {
         ...prev,
         [selectedDay]: updatedDay,
@@ -98,6 +99,17 @@ function CalendarDash() {
       [selectedDay]: {
         ...prev[selectedDay],
         [`${type}Type`]: value,
+      },
+    }));
+  };
+
+  const handleAmountChange = (type, value) => {
+    if (!selectedDay) return;
+    setDailyData(prev => ({
+      ...prev,
+      [selectedDay]: {
+        ...prev[selectedDay],
+        [`${type}Amount`]: value,
       },
     }));
   };
@@ -195,13 +207,22 @@ function CalendarDash() {
                     Pesticide
                   </label>
                   {dailyData[selectedDay]?.pesticide && (
-                    <input
-                      type="text"
-                      className="type-input"
-                      placeholder="Type of Pesticide"
-                      value={dailyData[selectedDay]?.pesticideType || ''}
-                      onChange={(e) => handleTypeChange('pesticide', e.target.value)}
-                    />
+                    <>
+                      <input
+                        type="text"
+                        className="type-input"
+                        placeholder="Type of Pesticide"
+                        value={dailyData[selectedDay]?.pesticideType || ''}
+                        onChange={(e) => handleTypeChange('pesticide', e.target.value)}
+                      />
+                      <input
+                        type="number"
+                        className="type-input"
+                        placeholder="Pesticide Amount (g)"
+                        value={dailyData[selectedDay]?.pesticideAmount || ''}
+                        onChange={(e) => handleAmountChange('pesticide', e.target.value)}
+                      />
+                    </>
                   )}
                   <label className="status-label">
                     <input
@@ -213,13 +234,22 @@ function CalendarDash() {
                     Fertilizer
                   </label>
                   {dailyData[selectedDay]?.fertilizer && (
-                    <input
-                      type="text"
-                      className="type-input"
-                      placeholder="Type of Fertilizer"
-                      value={dailyData[selectedDay]?.fertilizerType || ''}
-                      onChange={(e) => handleTypeChange('fertilizer', e.target.value)}
-                    />
+                    <>
+                      <input
+                        type="text"
+                        className="type-input"
+                        placeholder="Type of Fertilizer"
+                        value={dailyData[selectedDay]?.fertilizerType || ''}
+                        onChange={(e) => handleTypeChange('fertilizer', e.target.value)}
+                      />
+                      <input
+                        type="number"
+                        className="type-input"
+                        placeholder="Fertilizer Amount (g)"
+                        value={dailyData[selectedDay]?.fertilizerAmount || ''}
+                        onChange={(e) => handleAmountChange('fertilizer', e.target.value)}
+                      />
+                    </>
                   )}
                 </div>
               </>

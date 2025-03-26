@@ -1,8 +1,9 @@
-// src/components/WeatherForecast.jsx
 import React, { useState, useEffect } from 'react';
 import { FaCloudSun, FaSun, FaCloudRain, FaCloud, FaSnowflake } from 'react-icons/fa';
 import axios from 'axios';
-import './WeatherForecast.css'
+import { auth, db } from '../components/firebase'; // Import Firebase
+import { doc, getDoc } from 'firebase/firestore';
+import './WeatherForecast.css';
 
 const WeatherForecast = () => {
   const [forecastData, setForecastData] = useState([]);
@@ -15,6 +16,24 @@ const WeatherForecast = () => {
   const GEOCODING_API_URL = 'http://api.openweathermap.org/geo/1.0/direct';
   const FORECAST_API_URL = 'https://api.openweathermap.org/data/2.5/forecast';
 
+  // Fetch user location from Firestore
+  useEffect(() => {
+    const fetchUserLocation = async () => {
+      const user = auth.currentUser;
+      if (user) {
+        try {
+          const userDoc = await getDoc(doc(db, 'users', user.uid));
+          const userLocation = userDoc.exists() ? userDoc.data().location : '';
+          setLocation(userLocation || 'Penang'); // Default to Penang if not set
+        } catch (err) {
+          console.error('Error fetching user location:', err);
+          setLocation('Penang'); // Fallback to Penang
+        }
+      }
+    };
+    fetchUserLocation();
+  }, []);
+
   // Check for missing API key
   if (!OPENWEATHERMAP_API_KEY) {
     console.error('OpenWeatherMap API key is missing. Please set VITE_OPENWEATHERMAP_API_KEY in your .env file.');
@@ -25,7 +44,6 @@ const WeatherForecast = () => {
     setLoading(true);
     setError(null);
     try {
-      // Step 1: Get coordinates for the location
       const geoResponse = await axios.get(GEOCODING_API_URL, {
         params: {
           q: queryLocation,
@@ -40,33 +58,29 @@ const WeatherForecast = () => {
 
       const { lat, lon } = geoResponse.data[0];
 
-      // Step 2: Fetch the 5-day forecast (3-hour intervals)
       const response = await axios.get(FORECAST_API_URL, {
         params: {
           lat,
           lon,
           appid: OPENWEATHERMAP_API_KEY,
-          units: 'metric', // Use Celsius
-          cnt: 40, // Maximum 5 days (40 intervals, 3-hour each)
+          units: 'metric',
+          cnt: 40,
         },
       });
 
-      // Log the API response for debugging
       console.log('OpenWeatherMap API Response:', response.data);
 
-      // Process the forecast data to get daily averages
       const dailyForecast = [];
       const forecastList = response.data.list;
 
-      // Group data by day (take the first entry of each day for simplicity)
       for (let i = 0; i < forecastList.length && dailyForecast.length < 7; i += 8) {
         const day = forecastList[i];
         dailyForecast.push({
           date: day.dt_txt,
           temperature: Math.round(day.main.temp),
-          rain: day.rain ? (day.rain['3h'] || 0) : 0, // Rain in mm (3-hour accumulation)
-          wind: day.wind.speed * 3.6, // Convert m/s to km/h
-          weatherCode: day.weather[0].id, // Weather condition code
+          rain: day.rain ? (day.rain['3h'] || 0) : 0,
+          wind: day.wind.speed * 3.6,
+          weatherCode: day.weather[0].id,
         });
       }
 
@@ -99,28 +113,16 @@ const WeatherForecast = () => {
   };
 
   const getWeatherIcon = (weatherCode) => {
-    if (weatherCode === 800) return <FaSun />; // Clear
-    if (weatherCode >= 801 && weatherCode <= 804) return <FaCloud />; // Clouds
-    if (weatherCode >= 500 && weatherCode <= 531) return <FaCloudRain />; // Rain
-    if (weatherCode >= 600 && weatherCode <= 622) return <FaSnowflake />; // Snow
-    return <FaCloudSun />; // Default
+    if (weatherCode === 800) return <FaSun />;
+    if (weatherCode >= 801 && weatherCode <= 804) return <FaCloud />;
+    if (weatherCode >= 500 && weatherCode <= 531) return <FaCloudRain />;
+    if (weatherCode >= 600 && weatherCode <= 622) return <FaSnowflake />;
+    return <FaCloudSun />;
   };
 
   return (
     <div className="weather-forecast">
       <h3>Weather Forecast for {location}</h3>
-      {/* <form onSubmit={handleLocationSubmit} className="location-form">
-        <input
-          type="text"
-          value={inputLocation}
-          onChange={(e) => setInputLocation(e.target.value)}
-          placeholder="Enter city (e.g., Penang)"
-          className="location-input"
-        />
-        <button type="submit" className="location-submit-btn">
-          Update Location
-        </button>
-      </form> */}
       {loading && <p>Loading forecast...</p>}
       {error && (
         <div>

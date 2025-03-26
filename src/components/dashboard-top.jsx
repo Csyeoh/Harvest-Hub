@@ -1,24 +1,76 @@
-import React from "react";
+import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Navbar, Nav, Form, FormControl, Dropdown } from 'react-bootstrap';
-import { Link, useNavigate } from "react-router-dom";
-import { auth } from "./firebase"; // Adjust path if needed
-import { signOut} from "firebase/auth";
+import { Navbar, Nav, Form, FormControl, Dropdown, Modal, Button, Form as BootstrapForm } from 'react-bootstrap';
+import { auth, db } from './firebase'; // Import db and auth
+import { doc, getDoc, updateDoc } from 'firebase/firestore'; // Firestore methods
+import { signOut } from 'firebase/auth'; // Import signOut from Firebase
+import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
 import './dashboard-top.css';
 
 const TopNavbar = () => {
-  const navigate = useNavigate();
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [userData, setUserData] = useState({ name: '', email: '', location: '' });
+  const [newLocation, setNewLocation] = useState('');
+  const [error, setError] = useState('');
+  const navigate = useNavigate(); // Hook for navigation
+
+  // Fetch user data when component mounts
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const user = auth.currentUser;
+      if (user) {
+        // Fetch name and email from Firebase Auth
+        const name = user.displayName || 'Unknown';
+        const email = user.email || 'No email';
+
+        // Fetch location from Firestore
+        try {
+          const userDoc = await getDoc(doc(db, 'users', user.uid));
+          const location = userDoc.exists() ? userDoc.data().location || '' : '';
+          setUserData({ name, email, location });
+          setNewLocation(location); // Set initial value for the input
+        } catch (err) {
+          console.error('Error fetching user data:', err);
+          setError('Failed to fetch user data.');
+        }
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+  const handleUpdateLocation = async () => {
+    const user = auth.currentUser;
+    if (user) {
+      try {
+        await updateDoc(doc(db, 'users', user.uid), {
+          location: newLocation,
+        });
+        setUserData(prev => ({ ...prev, location: newLocation }));
+        setShowProfileModal(false);
+      } catch (err) {
+        console.error('Error updating location:', err);
+        setError('Failed to update location.');
+      }
+    }
+  };
+
+  // Handle navigation to Settings page
+  const handleSettingsNavigation = () => {
+    navigate('/dashboard/settings');
+  };
 
   // Handle logout
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      console.log("Logout successful");
-      navigate("/");
+      navigate('/login'); // Redirect to login page after logout
     } catch (err) {
-      console.error("Logout failed:", err);
+      console.error('Error logging out:', err);
+      setError('Failed to log out. Please try again.');
     }
   };
+
   return (
     <Navbar bg="dark" variant="dark" fixed="top" className="top-navbar">
       <div className="container-fluid justify-content-center">
@@ -73,18 +125,7 @@ const TopNavbar = () => {
               className="p-0 translation-toggle"
               variant="link"
             >
-              {/* Use a Bootstrap Icon or your custom image */}
-              {/* Option 1: Using Bootstrap Icon */}
               <i className="bi bi-globe"></i>
-
-              {/* Option 2: Using Custom Image (uncomment to use) */}
-              
-              {/* <img 
-                src="../translate.svg" 
-                alt="Translation" 
-                className="translation-img"
-              /> */}
-             
             </Dropdown.Toggle>
 
             <Dropdown.Menu align="end" className="mt-2 translation-menu">
@@ -117,14 +158,65 @@ const TopNavbar = () => {
             </Dropdown.Toggle>
 
             <Dropdown.Menu className="mt-2">
-              <Dropdown.Item href="#profile">Profile</Dropdown.Item>
-              <Dropdown.Item href="/dashboard/settings">Settings</Dropdown.Item>
+              <Dropdown.Item onClick={() => setShowProfileModal(true)}>
+                Profile
+              </Dropdown.Item>
+              <Dropdown.Item onClick={handleSettingsNavigation}>
+                Settings
+              </Dropdown.Item>
               <Dropdown.Divider />
-              <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
+              <Dropdown.Item onClick={handleLogout}>
+                Logout
+              </Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
         </Nav>
       </div>
+
+      {/* Profile Modal */}
+      <Modal show={showProfileModal} onHide={() => setShowProfileModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>User Profile</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {error && <p className="text-danger">{error}</p>}
+          <BootstrapForm>
+            <BootstrapForm.Group className="mb-3">
+              <BootstrapForm.Label>Name</BootstrapForm.Label>
+              <BootstrapForm.Control
+                type="text"
+                value={userData.name}
+                disabled
+              />
+            </BootstrapForm.Group>
+            <BootstrapForm.Group className="mb-3">
+              <BootstrapForm.Label>Email</BootstrapForm.Label>
+              <BootstrapForm.Control
+                type="email"
+                value={userData.email}
+                disabled
+              />
+            </BootstrapForm.Group>
+            <BootstrapForm.Group className="mb-3">
+              <BootstrapForm.Label>Location</BootstrapForm.Label>
+              <BootstrapForm.Control
+                type="text"
+                value={newLocation}
+                onChange={(e) => setNewLocation(e.target.value)}
+                placeholder="Enter your location"
+              />
+            </BootstrapForm.Group>
+          </BootstrapForm>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowProfileModal(false)}>
+            Close
+          </Button>
+          <Button variant="primary" onClick={handleUpdateLocation}>
+            Save Changes
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Navbar>
   );
 };

@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Modal, Button } from 'react-bootstrap';
+import { auth } from '../components/firebase';
 import './Report.css';
 
 function Report() {
-  const [loggedInFarmer] = useState('John Doe');
+  const [loggedInFarmer, setLoggedInFarmer] = useState('Loading...');
   const [currentPrice] = useState('RM2.50/kg');
   const [selectedPlantProfile, setSelectedPlantProfile] = useState(() => {
     const profile = localStorage.getItem('selectedPlantProfile');
@@ -14,16 +15,23 @@ function Report() {
     return savedData ? JSON.parse(savedData) : {
       plantingEnd: '',
       harvestAmount: '',
-      pesticideUsed: '',
-      pesticideAmount: '',
-      fertilizerUsed: '',
-      fertilizerAmount: '',
       disease: '',
     };
   });
   const [report, setReport] = useState(null);
   const [showReportModal, setShowReportModal] = useState(false);
   const reportRef = useRef();
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged(user => {
+      if (user) {
+        setLoggedInFarmer(user.displayName || 'Unknown Farmer');
+      } else {
+        setLoggedInFarmer('Unknown Farmer');
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     localStorage.setItem('reportFormData', JSON.stringify(formData));
@@ -35,7 +43,7 @@ function Report() {
       const newProfile = profile ? JSON.parse(profile) : { name: 'Not selected', startDate: '' };
       setSelectedPlantProfile(newProfile);
       if (report) {
-        const { pesticideDates, fertilizerDates, images } = fetchCalendarDataInRange(newProfile.startDate, report.plantingEnd);
+        const { pesticideDates, fertilizerDates, images, totalPesticideAmount, totalFertilizerAmount } = fetchCalendarDataInRange(newProfile.startDate, report.plantingEnd);
         const pesticideColumns = splitIntoColumns(pesticideDates);
         const fertilizerColumns = splitIntoColumns(fertilizerDates);
         setReport({
@@ -45,6 +53,8 @@ function Report() {
           pesticideColumns,
           fertilizerColumns,
           imagesInRange: images,
+          totalPesticideAmount,
+          totalFertilizerAmount,
         });
       }
     };
@@ -53,12 +63,14 @@ function Report() {
   }, [report]);
 
   const fetchCalendarDataInRange = (startDate, endDate) => {
-    if (!startDate || !endDate) return { pesticideDates: [], fertilizerDates: [], images: [] };
+    if (!startDate || !endDate) return { pesticideDates: [], fertilizerDates: [], images: [], totalPesticideAmount: 0, totalFertilizerAmount: 0 };
     const start = new Date(startDate);
     const end = new Date(endDate);
     const pesticideDates = [];
     const fertilizerDates = [];
     const images = [];
+    let totalPesticideAmount = 0;
+    let totalFertilizerAmount = 0;
 
     let current = new Date(start);
     while (current <= end) {
@@ -74,13 +86,17 @@ function Report() {
           pesticideDates.push({
             date: dateStr,
             type: parsedData[day].pesticideType || 'Not specified',
+            amount: parsedData[day].pesticideAmount || 0,
           });
+          totalPesticideAmount += Number(parsedData[day].pesticideAmount) || 0;
         }
         if (parsedData[day]?.fertilizer) {
           fertilizerDates.push({
             date: dateStr,
             type: parsedData[day].fertilizerType || 'Not specified',
+            amount: parsedData[day].fertilizerAmount || 0,
           });
+          totalFertilizerAmount += Number(parsedData[day].fertilizerAmount) || 0;
         }
         if (parsedData[day]?.image) {
           images.push({
@@ -92,7 +108,7 @@ function Report() {
       current.setDate(current.getDate() + 1);
     }
 
-    return { pesticideDates, fertilizerDates, images };
+    return { pesticideDates, fertilizerDates, images, totalPesticideAmount, totalFertilizerAmount };
   };
 
   const splitIntoColumns = (dates, maxRowsPerColumn = 10) => {
@@ -121,7 +137,7 @@ function Report() {
       alert('Please select a plant profile from the sidebar.');
       return;
     }
-    const { pesticideDates, fertilizerDates, images } = fetchCalendarDataInRange(selectedPlantProfile.startDate, formData.plantingEnd);
+    const { pesticideDates, fertilizerDates, images, totalPesticideAmount, totalFertilizerAmount } = fetchCalendarDataInRange(selectedPlantProfile.startDate, formData.plantingEnd);
     const pesticideColumns = splitIntoColumns(pesticideDates);
     const fertilizerColumns = splitIntoColumns(fertilizerDates);
 
@@ -131,15 +147,13 @@ function Report() {
       plantingStart: selectedPlantProfile.startDate,
       plantingEnd: formData.plantingEnd,
       harvestAmount: formData.harvestAmount,
-      pesticideUsed: formData.pesticideUsed,
-      pesticideAmount: formData.pesticideAmount,
-      fertilizerUsed: formData.fertilizerUsed,
-      fertilizerAmount: formData.fertilizerAmount,
       disease: formData.disease,
       currentPrice,
       pesticideColumns,
       fertilizerColumns,
       imagesInRange: images,
+      totalPesticideAmount,
+      totalFertilizerAmount,
     };
 
     setReport(newReport);
@@ -209,46 +223,6 @@ function Report() {
               />
             </div>
             <div className="form-group">
-              <label>Pesticide Used:</label>
-              <input
-                type="text"
-                value={formData.pesticideUsed}
-                onChange={(e) => setFormData(prev => ({ ...prev, pesticideUsed: e.target.value }))}
-                placeholder="e.g., Organic Pesticide"
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label>Pesticide Amount (g):</label>
-              <input
-                type="number"
-                value={formData.pesticideAmount}
-                onChange={(e) => setFormData(prev => ({ ...prev, pesticideAmount: e.target.value }))}
-                placeholder="e.g., 500"
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label>Fertilizer Used:</label>
-              <input
-                type="text"
-                value={formData.fertilizerUsed}
-                onChange={(e) => setFormData(prev => ({ ...prev, fertilizerUsed: e.target.value }))}
-                placeholder="e.g., Urea"
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label>Fertilizer Amount (g):</label>
-              <input
-                type="number"
-                value={formData.fertilizerAmount}
-                onChange={(e) => setFormData(prev => ({ ...prev, fertilizerAmount: e.target.value }))}
-                placeholder="e.g., 1000"
-                required
-              />
-            </div>
-            <div className="form-group">
               <label>Disease:</label>
               <input
                 type="text"
@@ -271,7 +245,6 @@ function Report() {
           </form>
         </div>
 
-        {/* Modal for Generated Report */}
         <Modal 
           show={showReportModal} 
           onHide={() => setShowReportModal(false)} 
@@ -296,10 +269,8 @@ function Report() {
                     <p><strong>Harvest Amount (kg):</strong> {report.harvestAmount}</p>
                   </div>
                   <div className="column">
-                    <p><strong>Pesticide Used:</strong> {report.pesticideUsed}</p>
-                    <p><strong>Pesticide Amount (g):</strong> {report.pesticideAmount}</p>
-                    <p><strong>Fertilizer Used:</strong> {report.fertilizerUsed}</p>
-                    <p><strong>Fertilizer Amount (g):</strong> {report.fertilizerAmount}</p>
+                    <p><strong>Total Pesticide Amount (g):</strong> {report.totalPesticideAmount}</p>
+                    <p><strong>Total Fertilizer Amount (g):</strong> {report.totalFertilizerAmount}</p>
                     <p><strong>Disease:</strong> {report.disease}</p>
                     <p><strong>Current Price:</strong> {report.currentPrice}</p>
                   </div>
@@ -323,6 +294,7 @@ function Report() {
                               <tr>
                                 <th>Date</th>
                                 <th>Type</th>
+                                <th>Amount (g)</th>
                               </tr>
                             </thead>
                             <tbody>
@@ -331,11 +303,12 @@ function Report() {
                                   <tr key={index}>
                                     <td>{entry.date}</td>
                                     <td>{entry.type}</td>
+                                    <td>{entry.amount}</td>
                                   </tr>
                                 ))
                               ) : (
                                 <tr>
-                                  <td colSpan="2">No pesticide applications</td>
+                                  <td colSpan="3">No pesticide applications</td>
                                 </tr>
                               )}
                             </tbody>
@@ -352,6 +325,7 @@ function Report() {
                               <tr>
                                 <th>Date</th>
                                 <th>Type</th>
+                                <th>Amount (g)</th>
                               </tr>
                             </thead>
                             <tbody>
@@ -360,11 +334,12 @@ function Report() {
                                   <tr key={index}>
                                     <td>{entry.date}</td>
                                     <td>{entry.type}</td>
+                                    <td>{entry.amount}</td>
                                   </tr>
                                 ))
                               ) : (
                                 <tr>
-                                  <td colSpan="2">No fertilizer applications</td>
+                                  <td colSpan="3">No fertilizer applications</td>
                                 </tr>
                               )}
                             </tbody>
