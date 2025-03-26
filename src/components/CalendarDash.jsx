@@ -19,32 +19,30 @@ function CalendarDash() {
   }, [dailyData, currentYear, currentMonth]);
 
   const handlePrevMonth = () => {
-    setCurrentMonth(prev => {
-      if (prev === 0) {
-        setCurrentYear(year => year - 1);
-        return 11;
-      }
-      return prev - 1;
-    });
-    setDailyData(() => {
-      const savedData = localStorage.getItem(`dailyData_${currentYear}_${currentMonth - 1}`);
-      return savedData ? JSON.parse(savedData) : {};
-    });
+    if (currentMonth === 0) {
+      setCurrentYear(prevYear => prevYear - 1);
+      setCurrentMonth(11);
+    } else {
+      setCurrentMonth(prevMonth => prevMonth - 1);
+    }
+    const newYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+    const newMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+    const savedData = localStorage.getItem(`dailyData_${newYear}_${newMonth}`);
+    setDailyData(savedData ? JSON.parse(savedData) : {});
     setSelectedDay(null);
   };
 
   const handleNextMonth = () => {
-    setCurrentMonth(prev => {
-      if (prev === 11) {
-        setCurrentYear(year => year + 1);
-        return 0;
-      }
-      return prev + 1;
-    });
-    setDailyData(() => {
-      const savedData = localStorage.getItem(`dailyData_${currentYear}_${currentMonth + 1}`);
-      return savedData ? JSON.parse(savedData) : {};
-    });
+    if (currentMonth === 11) {
+      setCurrentYear(prevYear => prevYear + 1);
+      setCurrentMonth(0);
+    } else {
+      setCurrentMonth(prevMonth => prevMonth + 1);
+    }
+    const newYear = currentMonth === 11 ? currentYear + 1 : currentYear;
+    const newMonth = currentMonth === 11 ? 0 : currentMonth + 1;
+    const savedData = localStorage.getItem(`dailyData_${newYear}_${newMonth}`);
+    setDailyData(savedData ? JSON.parse(savedData) : {});
     setSelectedDay(null);
   };
 
@@ -58,7 +56,7 @@ function CalendarDash() {
           ...prev,
           [selectedDay]: {
             ...prev[selectedDay],
-            image: reader.result,
+            image: reader.result, // Store Base64 string in localStorage
           },
         }));
       };
@@ -83,7 +81,10 @@ function CalendarDash() {
     setDailyData(prev => {
       const updatedDay = { ...prev[selectedDay] };
       updatedDay[type] = checked;
-      if (!checked) delete updatedDay[`${type}Type`];
+      if (!checked) {
+        delete updatedDay[`${type}Type`];
+        delete updatedDay[`${type}Amount`];
+      }
       return {
         ...prev,
         [selectedDay]: updatedDay,
@@ -102,7 +103,17 @@ function CalendarDash() {
     }));
   };
 
-  // Events for pesticide/fertilizer
+  const handleAmountChange = (type, value) => {
+    if (!selectedDay) return;
+    setDailyData(prev => ({
+      ...prev,
+      [selectedDay]: {
+        ...prev[selectedDay],
+        [`${type}Amount`]: value,
+      },
+    }));
+  };
+
   const events = Object.keys(dailyData).reduce((acc, day) => {
     const data = dailyData[day];
     let marker = '';
@@ -117,7 +128,6 @@ function CalendarDash() {
     return acc;
   }, {});
 
-  // Images indicator
   const images = Object.keys(dailyData).reduce((acc, day) => {
     if (dailyData[day].image) acc[day] = true;
     return acc;
@@ -139,7 +149,7 @@ function CalendarDash() {
           month={currentMonth}
           year={currentYear}
           events={events}
-          images={images} // Pass images to CalendarComp
+          images={images}
           onDayClick={setSelectedDay}
         />
         <div className="soil-status">
@@ -197,13 +207,22 @@ function CalendarDash() {
                     Pesticide
                   </label>
                   {dailyData[selectedDay]?.pesticide && (
-                    <input
-                      type="text"
-                      className="type-input"
-                      placeholder="Type of Pesticide"
-                      value={dailyData[selectedDay]?.pesticideType || ''}
-                      onChange={(e) => handleTypeChange('pesticide', e.target.value)}
-                    />
+                    <>
+                      <input
+                        type="text"
+                        className="type-input"
+                        placeholder="Type of Pesticide"
+                        value={dailyData[selectedDay]?.pesticideType || ''}
+                        onChange={(e) => handleTypeChange('pesticide', e.target.value)}
+                      />
+                      <input
+                        type="number"
+                        className="type-input"
+                        placeholder="Pesticide Amount (g)"
+                        value={dailyData[selectedDay]?.pesticideAmount || ''}
+                        onChange={(e) => handleAmountChange('pesticide', e.target.value)}
+                      />
+                    </>
                   )}
                   <label className="status-label">
                     <input
@@ -215,13 +234,22 @@ function CalendarDash() {
                     Fertilizer
                   </label>
                   {dailyData[selectedDay]?.fertilizer && (
-                    <input
-                      type="text"
-                      className="type-input"
-                      placeholder="Type of Fertilizer"
-                      value={dailyData[selectedDay]?.fertilizerType || ''}
-                      onChange={(e) => handleTypeChange('fertilizer', e.target.value)}
-                    />
+                    <>
+                      <input
+                        type="text"
+                        className="type-input"
+                        placeholder="Type of Fertilizer"
+                        value={dailyData[selectedDay]?.fertilizerType || ''}
+                        onChange={(e) => handleTypeChange('fertilizer', e.target.value)}
+                      />
+                      <input
+                        type="number"
+                        className="type-input"
+                        placeholder="Fertilizer Amount (g)"
+                        value={dailyData[selectedDay]?.fertilizerAmount || ''}
+                        onChange={(e) => handleAmountChange('fertilizer', e.target.value)}
+                      />
+                    </>
                   )}
                 </div>
               </>

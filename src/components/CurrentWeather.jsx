@@ -1,12 +1,13 @@
-// src/components/CurrentWeather.jsx
 import React, { useState, useEffect } from 'react';
 import { FaCloudSun, FaSun, FaCloudRain, FaCloud, FaSnowflake } from 'react-icons/fa';
 import axios from 'axios';
+import { auth, db } from '../components/firebase'; // Import Firebase
+import { doc, getDoc } from 'firebase/firestore';
 import './CurrentWeather.css';
 
 const CurrentWeather = () => {
   const [weatherData, setWeatherData] = useState(null);
-  const [location, setLocation] = useState('Penang'); // Default location updated to Penang
+  const [location, setLocation] = useState('Penang'); // Default location
   const [inputLocation, setInputLocation] = useState('');
   const [currentTime, setCurrentTime] = useState(new Date());
   const [loading, setLoading] = useState(false);
@@ -15,6 +16,24 @@ const CurrentWeather = () => {
   const OPENWEATHERMAP_API_KEY = import.meta.env.VITE_OPENWEATHERMAP_API_KEY;
   const GEOCODING_API_URL = 'http://api.openweathermap.org/geo/1.0/direct';
   const CURRENT_WEATHER_API_URL = 'https://api.openweathermap.org/data/2.5/weather';
+
+  // Fetch user location from Firestore
+  useEffect(() => {
+    const fetchUserLocation = async () => {
+      const user = auth.currentUser;
+      if (user) {
+        try {
+          const userDoc = await getDoc(doc(db, 'users', user.uid));
+          const userLocation = userDoc.exists() ? userDoc.data().location : '';
+          setLocation(userLocation || 'Penang'); // Default to Penang if not set
+        } catch (err) {
+          console.error('Error fetching user location:', err);
+          setLocation('Penang'); // Fallback to Penang
+        }
+      }
+    };
+    fetchUserLocation();
+  }, []);
 
   // Check for missing API key
   if (!OPENWEATHERMAP_API_KEY) {
@@ -26,7 +45,7 @@ const CurrentWeather = () => {
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
-    }, 60000); // Update every minute
+    }, 60000);
     return () => clearInterval(timer);
   }, []);
 
@@ -34,7 +53,6 @@ const CurrentWeather = () => {
     setLoading(true);
     setError(null);
     try {
-      // Step 1: Get coordinates for the location
       const geoResponse = await axios.get(GEOCODING_API_URL, {
         params: {
           q: queryLocation,
@@ -49,13 +67,12 @@ const CurrentWeather = () => {
 
       const { lat, lon } = geoResponse.data[0];
 
-      // Step 2: Fetch the current weather
       const response = await axios.get(CURRENT_WEATHER_API_URL, {
         params: {
           lat,
           lon,
           appid: OPENWEATHERMAP_API_KEY,
-          units: 'metric', // Use Celsius
+          units: 'metric',
         },
       });
 
@@ -103,18 +120,6 @@ const CurrentWeather = () => {
   return (
     <div className="weather-card">
       <h3>Current Weather in {location}</h3>
-      {/* <form onSubmit={handleLocationSubmit} className="location-form">
-        <input
-          type="text"
-          value={inputLocation}
-          onChange={(e) => setInputLocation(e.target.value)}
-          placeholder="Enter city (e.g., Penang)"
-          className="location-input"
-        />
-        <button type="submit" className="location-submit-btn">
-          Update Location
-        </button>
-      </form> */}
       {loading && <p>Loading weather...</p>}
       {error && (
         <div>

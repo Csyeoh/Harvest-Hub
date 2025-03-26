@@ -2,9 +2,13 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { IoPersonOutline, IoMailOutline, IoLockClosedOutline, IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 import { auth } from "../components/firebase";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import "bootstrap/dist/css/bootstrap.min.css"; // Ensure Bootstrap is imported
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { getFirestore, doc, setDoc } from "firebase/firestore"; // Import Firestore
+import "bootstrap/dist/css/bootstrap.min.css";
 import "./Signup.css";
+
+// Initialize Firestore
+const db = getFirestore();
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -23,7 +27,22 @@ const Signup = () => {
       return;
     }
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      // Create user with email and password
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // Update the user's profile with the username
+      await updateProfile(user, {
+        displayName: username,
+      });
+
+      // Save additional user data (like location) to Firestore
+      await setDoc(doc(db, "users", user.uid), {
+        username: username,
+        email: email,
+        location: "", // Initialize location as empty
+      });
+
       console.log("Signup successful with:", { username, email });
       navigate("/login");
     } catch (err) {
@@ -34,7 +53,7 @@ const Signup = () => {
 
   return (
     <div className="auth-container">
-      <div className="auth-background"></div> {/* Background layer */}
+      <div className="auth-background"></div>
       <a href="/">
         <img src="../hhbot.svg" alt="hhbot" className="logsign-img" />
       </a>

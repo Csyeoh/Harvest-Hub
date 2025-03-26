@@ -1,75 +1,74 @@
-// components/ImageUpload.jsx
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import './ImageUpload.css';
 
 const ImageUpload = () => {
-  const [images, setImages] = useState([]); // State to store uploaded images
+  const [images, setImages] = useState([]); // State for locally uploaded images (before submission)
+  const [successMessage, setSuccessMessage] = useState(''); // State for success message
+  const [error, setError] = useState(''); // State for error messages
 
   // Handle file drop or selection
   const onDrop = useCallback((acceptedFiles) => {
-    const newImages = acceptedFiles.map((file) => ({
-      file,
-      preview: URL.createObjectURL(file), // Create a preview URL for the image
-    }));
-    setImages((prevImages) => [...prevImages, ...newImages]); // Add new images to the state
+    const newImages = acceptedFiles.map((file) => {
+      const preview = URL.createObjectURL(file);
+      return { file, preview };
+    });
+    setImages((prevImages) => [...prevImages, ...newImages]);
+    setSuccessMessage(''); // Clear success message when new images are added
+    setError(''); // Clear error message when new images are added
   }, []);
 
   // Configure react-dropzone
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
-      'image/*': ['.jpeg', '.jpg', '.png', '.gif'], // Accept only image files
+      'image/*': ['.jpeg', '.jpg', '.png', '.gif'],
     },
-    multiple: true, // Allow multiple file uploads
+    multiple: true,
   });
 
   // Clean up preview URLs to avoid memory leaks
-  React.useEffect(() => {
+  useEffect(() => {
     return () => {
       images.forEach((image) => URL.revokeObjectURL(image.preview));
     };
   }, [images]);
 
-  // Remove an image from the list
+  // Remove an image from the local list (before submission)
   const removeImage = (index) => {
     setImages((prevImages) => {
       const newImages = [...prevImages];
-      URL.revokeObjectURL(newImages[index].preview); // Clean up the preview URL
-      newImages.splice(index, 1); // Remove the image
+      URL.revokeObjectURL(newImages[index].preview);
+      newImages.splice(index, 1);
       return newImages;
     });
   };
 
-  // Handle form submission
+  // Handle form submission (show confirmation message and clear images)
   const handleSubmit = (e) => {
     e.preventDefault();
+    setError('');
+    setSuccessMessage('');
+
     if (images.length === 0) {
-      alert('Please upload at least one image before submitting.');
+      setError('Please upload at least one image before submitting.');
       return;
     }
-    // Log the uploaded images to the console (replace with your submission logic)
-    console.log('Submitted images:', images);
-    // Example: You can access the File objects for submission to a server
-    const formData = new FormData();
-    images.forEach((image, index) => {
-      formData.append(`image-${index}`, image.file);
-    });
-    // Example: Send formData to a server (uncomment and modify as needed)
-    /*
-    fetch('/your-api-endpoint', {
-      method: 'POST',
-      body: formData,
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log('Success:', data);
-        setImages([]); // Clear images after successful submission
-      })
-      .catch((error) => {
-        console.error('Error:', error);
-      });
-    */
+
+    try {
+      // Simulate a successful upload (no actual storage)
+      console.log('Simulating upload of images:', images);
+
+      // Clear the local images after "submission"
+      images.forEach((image) => URL.revokeObjectURL(image.preview));
+      setImages([]);
+
+      // Show success message
+      setSuccessMessage('Images uploaded successfully!');
+    } catch (err) {
+      console.error('Error during submission:', err);
+      setError('Failed to process images. Please try again.');
+    }
   };
 
   return (
@@ -86,10 +85,14 @@ const ImageUpload = () => {
         )}
       </div>
 
-      {/* Preview of uploaded images */}
+      {/* Display error or success message */}
+      {error && <p className="text-danger mt-2">{error}</p>}
+      {successMessage && <p className="text-success mt-2">{successMessage}</p>}
+
+      {/* Preview of locally uploaded images (before submission) */}
       {images.length > 0 && (
         <div className="image-preview-container">
-          <h4>Uploaded Images</h4>
+          <h4>Uploaded Images (Pending Submission)</h4>
           <div className="image-preview-grid">
             {images.map((image, index) => (
               <div key={index} className="image-preview">
