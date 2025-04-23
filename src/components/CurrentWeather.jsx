@@ -1,113 +1,83 @@
 import React, { useState, useEffect } from 'react';
 import { FaCloudSun, FaSun, FaCloudRain, FaCloud, FaSnowflake } from 'react-icons/fa';
-import axios from 'axios';
-import { auth, db } from '../components/firebase'; // Import Firebase
-import { doc, getDoc } from 'firebase/firestore';
-import './CurrentWeather.css';
+import { getDynamicRecommendation } from '../../geminiClient';
 
-const CurrentWeather = () => {
-  const [weatherData, setWeatherData] = useState(null);
-  const [location, setLocation] = useState('Penang'); // Default location
-  const [inputLocation, setInputLocation] = useState('');
+const CurrentWeather = ({ weatherData, setWeatherData, location, setLocation, addNotification }) => {
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [selectedCrop, setSelectedCrop] = useState('Unknown');
 
-  const OPENWEATHERMAP_API_KEY = import.meta.env.VITE_OPENWEATHERMAP_API_KEY;
-  const GEOCODING_API_URL = 'http://api.openweathermap.org/geo/1.0/direct';
-  const CURRENT_WEATHER_API_URL = 'https://api.openweathermap.org/data/2.5/weather';
-
-  // Fetch user location from Firestore
   useEffect(() => {
-    const fetchUserLocation = async () => {
-      const user = auth.currentUser;
-      if (user) {
-        try {
-          const userDoc = await getDoc(doc(db, 'users', user.uid));
-          const userLocation = userDoc.exists() ? userDoc.data().location : '';
-          setLocation(userLocation || 'Penang'); // Default to Penang if not set
-        } catch (err) {
-          console.error('Error fetching user location:', err);
-          setLocation('Penang'); // Fallback to Penang
-        }
-      }
+    const fetchSelectedCrop = () => {
+      const profile = localStorage.getItem('selectedPlantProfile');
+      const parsedProfile = profile ? JSON.parse(profile) : { name: 'Unknown', startDate: '' };
+      setSelectedCrop(parsedProfile.name === 'Select Plant Profile' ? 'Unknown' : parsedProfile.name);
     };
-    fetchUserLocation();
+
+    fetchSelectedCrop();
+    window.addEventListener('storage', fetchSelectedCrop);
+    return () => window.removeEventListener('storage', fetchSelectedCrop);
   }, []);
 
-  // Check for missing API key
-  if (!OPENWEATHERMAP_API_KEY) {
-    console.error('OpenWeatherMap API key is missing. Please set VITE_OPENWEATHERMAP_API_KEY in your .env file.');
-    setError('Error: OpenWeatherMap API key is missing. Please contact support.');
-  }
+  const getFallbackWeatherRecommendation = (crop, weather, temp, windSpeed) => {
+    let message = `${crop}: `;
+    const weatherId = weather[0].id;
 
-  // Update current time every minute
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 60000);
-    return () => clearInterval(timer);
-  }, []);
+    if (weatherId >= 500 && weatherId <= 531) {
+      message += `Rain detected (ID: ${weatherId}). Consider protecting ${crop} from excess water.`;
+    } else if (temp > 35) {
+      message += `High temperature (${temp}°C). Provide shade or increase irrigation for ${crop}.`;
+    } else if (temp < 10) {
+      message += `Low temperature (${temp}°C). Protect ${crop} from cold stress.`;
+    } else if (windSpeed > 10) {
+      message += `High wind speed (${windSpeed} m/s). Secure ${crop} against wind damage.`;
+    } else {
+      return null;
+    }
 
-  const fetchCurrentWeather = async (queryLocation) => {
-    setLoading(true);
-    setError(null);
+    return message;
+  };
+
+  const checkExtremeWeather = async () => {
+    if (!weatherData || typeof addNotification !== 'function') {
+      console.error('Weather data missing or addNotification is not a function');
+      return;
+    }
+
+    const { weather, main, wind } = weatherData;
+    const context = `Crop: ${selectedCrop}, Weather ID: ${weather[0].id}, Temp: ${main.temp}°C, Wind: ${wind.speed} m/s`;
+    let geminiMessage;
     try {
-      const geoResponse = await axios.get(GEOCODING_API_URL, {
-        params: {
-          q: queryLocation,
-          limit: 1,
-          appid: OPENWEATHERMAP_API_KEY,
-        },
-      });
-
-      if (!geoResponse.data || geoResponse.data.length === 0) {
-        throw new Error('Location not found. Please enter a valid city.');
-      }
-
-      const { lat, lon } = geoResponse.data[0];
-
-      const response = await axios.get(CURRENT_WEATHER_API_URL, {
-        params: {
-          lat,
-          lon,
-          appid: OPENWEATHERMAP_API_KEY,
-          units: 'metric',
-        },
-      });
-
-      console.log('OpenWeatherMap Current Weather Response:', response.data);
-      setWeatherData(response.data);
+      geminiMessage = await getDynamicRecommendation(context, 'weather');
+      console.log('Gemini weather recommendation:', geminiMessage);
     } catch (err) {
-      console.error('Error fetching current weather:', err.message);
-      console.error('Error details:', err.response?.data);
-      if (err.response?.status === 401) {
-        setError('Invalid OpenWeatherMap API key. Please check your API key in the .env file or generate a new one at openweathermap.org.');
-      } else {
-        setError(`Failed to fetch current weather: ${err.message}. Please try again.`);
-      }
-    } finally {
-      setLoading(false);
+      console.error('Error fetching Gemini recommendation for weather:', err);
+      geminiMessage = null;
+    }
+
+    const message = geminiMessage && geminiMessage !== 'No suggestion available.'
+      ? geminiMessage
+      : getFallbackWeatherRecommendation(selectedCrop, weather, main.temp, wind.speed);
+
+    if (message) {
+      const notification = {
+        id: `dynamic-weather-${Date.now()}`,
+        message,
+        timestamp: new Date().toLocaleTimeString(),
+      };
+
+      console.log('Generated weather notification:', notification);
+      addNotification(notification);
+    } else {
+      console.log('No actionable weather suggestion for:', context);
     }
   };
 
   useEffect(() => {
-    if (OPENWEATHERMAP_API_KEY) {
-      fetchCurrentWeather(location);
+    if (weatherData) {
+      setCurrentTime(new Date());
+      checkExtremeWeather();
     }
-  }, [location]);
-
-  const handleLocationSubmit = (e) => {
-    e.preventDefault();
-    if (inputLocation.trim()) {
-      setLocation(inputLocation.trim());
-      setInputLocation('');
-    }
-  };
-
-  const handleRetry = () => {
-    fetchCurrentWeather(location);
-  };
+  }, [weatherData]);
 
   const getWeatherIcon = (weatherCode) => {
     if (weatherCode === 800) return <FaSun />;
@@ -120,16 +90,9 @@ const CurrentWeather = () => {
   return (
     <div className="weather-card">
       <h3>Current Weather in {location}</h3>
-      {loading && <p>Loading weather...</p>}
-      {error && (
-        <div>
-          <p className="error-message">{error}</p>
-          <button onClick={handleRetry} className="retry-btn">
-            Retry
-          </button>
-        </div>
-      )}
-      {!loading && !error && weatherData && (
+      {!weatherData ? (
+        <p>Loading weather...</p>
+      ) : (
         <>
           <p className="weather-time">{currentTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })}</p>
           <div className="weather-info">
