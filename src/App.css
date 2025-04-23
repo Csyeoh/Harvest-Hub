@@ -193,7 +193,7 @@ p {
 .progress-circle {
   width: 100px;
   height: 100px;
-  background: conic-gradient(var(--secondary-color) 0% 30%, #ddd 30% 100%);
+  background: conic-gradient(var(--secondary-color) 0% 14%, #ddd 14% 100%);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -204,7 +204,344 @@ p {
 
 .progress-circle p {
   z-index: 5;
-  text-align: center;
+  text-align:/* Global Styles */
+  :root {
+    --primary-color: #2E7D32;
+    --secondary-color: #4CAF50;
+    --background-color: #F4F4F4;
+    --text-color: #1A1A1A;
+    --error-color: #D32F2F;
+    --success-color: #388E3C;
+    --card-background: #FFFFFF;
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --border-radius: 12px;
+    --transition: all 0.3s ease;
+  }
+  
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  body {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    transition: var(--transition);
+  }
+  
+  h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--primary-color);
+  }
+  
+  p {
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--text-color);
+  }
+  
+  /* Animations */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .fade-in {
+    animation: fadeIn 0.5s ease forwards;
+  }
+  
+  /* Ensure the main content starts after the TopNavbar and Sidebar */
+  .main-content {
+    margin-left: 250px;
+    padding: 20px;
+    background-color: var(--background-color);
+    height: calc(100vh - 60px);
+    overflow-y: auto;
+  }
+  
+  /* Dashboard content container */
+  .dashboard-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 100%;
+  }
+  
+  /* Top row: Weather, Harvest, Markets */
+  .top-row {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  
+  /* Mid row: Weather Forecast */
+  .mid-row {
+    padding-top: 20px;
+    display: flex;
+    gap: 20px;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+  
+  /* Bottom row: Calendar and Soil Status */
+  .bottom-row {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  
+  /* General Card Styles */
+  .weather-card,
+  .harvest-card,
+  .markets-card,
+  .weather-forecast,
+  .calendar-card,
+  .soil-card-d {
+    background-color: var(--card-background);
+    padding: 15px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    flex: 1;
+    min-width: 250px;
+    max-width: 100%;
+    transition: var(--transition);
+  }
+  
+  .weather-card:hover,
+  .harvest-card:hover,
+  .markets-card:hover,
+  .weather-forecast:hover,
+  .calendar-card:hover,
+  .soil-card-d:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* Card Backgrounds in Light Mode */
+  .markets-card {
+    background: linear-gradient(135deg, var(--card-background) 0%, #f0f4f0 100%);
+  }
+  
+  .harvest-card {
+    text-align: left;
+    background: linear-gradient(135deg, var(--card-background) 0%, #fff9e6 100%);
+  }
+  
+  .soil-card-d {
+    background: linear-gradient(135deg, var(--card-background) 0%, #f0f8f0 100%);
+  }
+  
+  .calendar-card {
+    background: linear-gradient(135deg, var(--card-background) 0%, #f0f4f8 100%);
+  }
+  
+  /* Markets Styles */
+  .markets-card .market-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 8px;
+    background-color: rgba(76, 175, 80, 0.05);
+  }
+  
+  .markets-card .plant-name {
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: var(--primary-color);
+  }
+  
+  .markets-card .unit {
+    font-size: 0.9rem;
+    color: #666;
+  }
+  
+  .markets-card .market-value {
+    font-size: 1.2rem;
+    font-weight: 600;
+  }
+  
+  .markets-card .market-value.positive {
+    color: var(--success-color);
+  }
+  
+  .markets-card .market-value.price {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+  }
+  
+  /* Harvest Card Styles */
+  .harvest-card {
+    text-align: left;
+  }
+  
+  .harvest-card table {
+    width: 100%;
+  }
+  
+  .harvest-card td {
+    vertical-align: top;
+  }
+  
+  .harvest-card h3 {
+    margin-bottom: 0.5rem;
+  }
+  
+  .harvest-card p {
+    font-size: 1.1rem;
+  }
+  
+  .progress-circle {
+    width: 100px;
+    height: 100px;
+    background: conic-gradient(var(--secondary-color) 0% var(--progress), #ddd var(--progress) 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 10px auto;
+    position: relative;
+  }
+  
+  .progress-circle p {
+    z-index: 5;
+    text-align: center;
+    font-size: 0.9rem;
+    margin-bottom: 0;
+  }
+  
+  .progress-circle span {
+    z-index: 5;
+    font-size: small;
+  }
+  
+  .progress-circle::before {
+    content: '';
+    width: 70px;
+    height: 70px;
+    background-color: var(--card-background);
+    border-radius: 50%;
+    position: absolute;
+  }
+  
+  /* Soil Status Styles */
+  .soil-status {
+    display: flex;
+    gap: 20px;
+    flex: 1;
+    min-width: 250px;
+    max-width: 100%;
+    flex-wrap: wrap;
+  }
+  
+  .soil-card-d {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 200px;
+  }
+  
+  .soil-icon {
+    font-size: 1.5rem;
+    color: var(--secondary-color);
+    flex-shrink: 0;
+  }
+  
+  .soil-card-d p {
+    font-size: 0.95rem;
+    margin: 0;
+  }
+  
+  .status-poor {
+    color: var(--error-color);
+    font-weight: 600;
+  }
+  
+  .status-warning {
+    color: #F57C00;
+    font-weight: 600;
+  }
+  
+  .status-excellent {
+    color: var(--success-color);
+    font-weight: 600;
+  }
+  
+  /* Calendar Styles */
+  .calendar-card {
+    background: linear-gradient(135deg, var(--card-background) 0%, #f0f4f8 100%);
+  }
+  
+  .calendar-header {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--primary-color);
+  }
+  
+  .calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    gap: 5px;
+  }
+  
+  .calendar-days span {
+    padding: 8px;
+    border-radius: 50%;
+    transition: var(--transition);
+  }
+  
+  .calendar-days span:hover {
+    background-color: var(--secondary-color);
+    color: #fff;
+  }
+  
+  .calendar-days .today {
+    background-color: var(--primary-color);
+    color: #fff;
+  }
+  
+  /* Email Icon */
+  .email-icon {
+    color: #ffffff;
+    font-size: 1.5rem;
+    transition: var(--transition);
+  }
+  
+  .email-icon:hover {
+    color: #cccccc;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .main-content {
+      margin-left: 0;
+      padding: 15px;
+    }
+  
+    .top-row,
+    .mid-row,
+    .bottom-row {
+      flex-direction: column;
+    }
+  
+    .weather-card,
+    .harvest-card,
+    .markets-card,
+    .weather-forecast,
+    .calendar-card,
+    .soil-card-d {
+      min-width: 100%;
+    }
+  } center;
   font-size: 0.9rem;
   margin-bottom: 0;
 }
