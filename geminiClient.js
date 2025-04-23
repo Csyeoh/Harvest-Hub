@@ -6,18 +6,23 @@ const genAI = new GoogleGenerativeAI(API_KEY);
 export const getDynamicRecommendation = async (context, type = 'weather', promptOverride = null) => {
   const optimalRanges = type === 'weather'
     ? 'Optimal temperature: 20-30°C, Wind: <10 m/s, Weather: Clear to partly cloudy.'
-    : 'Optimal soil moisture: 20-60%, Optimal pH: 6.0-7.0.';
+    : type === 'soil'
+    ? 'Optimal soil moisture: 20-60%, Optimal pH: 6.0-7.0.'
+    : 'Optimal temperature: 20-30°C, Optimal soil moisture: 20-60%, Optimal pH: 6.0-7.0.';
 
   const prompt = promptOverride || (type === 'weather'
     ? `Given the following weather data and optimal ranges (${optimalRanges}), provide a specific, actionable recommendation for farmers growing a particular crop in less than 30 words: ${context}`
-    : `Given the following soil data and optimal ranges (${optimalRanges}), provide a specific, actionable action plan for farmers growing a particular crop in less than 30 words: ${context}`);
+    : type === 'soil'
+    ? `Given the following soil data and optimal ranges (${optimalRanges}), provide a specific, actionable action plan for farmers growing a particular crop in less than 30 words: ${context}`
+    : `Given the following weather and soil data and optimal ranges (${optimalRanges}), provide a specific, actionable recommendation for farmers in less than 30 words: ${context}`);
 
   try {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const suggestion = response.text();
+
+    console.log('Raw Gemini API Recommendation (getDynamicRecommendation):', suggestion);
 
     if (!suggestion) {
       console.error('Gemini API response missing text:', response);

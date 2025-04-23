@@ -1,124 +1,111 @@
-/* App.css */
-
 /* Current Weather Styles */
 .weather-card {
-    background-color: #2C3E50; /* Dark blue background */
-    border-radius: 12px;
-    padding: 1.5rem;
-    color: #fff; /* White text */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  }
-  
-  .weather-card h3 {
-    margin-bottom: 1rem;
-    font-size: 1.25rem;
-    font-weight: 600;
-  }
-  
-  .location-form {
-    display: flex;
-    gap: 0.75rem;
-    margin-bottom: 1rem;
-  }
-  
-  .location-input {
-    flex-grow: 1;
-    padding: 0.5rem 1rem;
-    border: none;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    outline: none;
-    background-color: #fff;
-    color: #333;
-  }
-  
-  .location-input::placeholder {
-    color: #6c757d;
-  }
-  
-  .location-submit-btn {
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    border-radius: 20px;
-    padding: 0.5rem 1rem;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .location-submit-btn:hover {
-    background-color: #0056b3;
-  }
-  
-  .weather-time {
-    font-size: 0.9rem;
-    color: #d1d5db; /* Light gray for time */
-    margin-bottom: 0.75rem;
-  }
-  
-  .weather-info {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
-  
-  .weather-icon {
-    font-size: 2.5rem;
-  }
-  
-  .weather-details {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
-  
-  .temperature {
-    font-size: 2rem;
-    font-weight: bold;
-    margin: 0;
-  }
-  
-  .weather-condition {
-    font-size: 0.9rem;
-    line-height: 1.4;
-  }
-  
-  .weather-condition b {
-    font-weight: 600;
-  }
-  
-  .error-message {
-    color: #ff6b6b; /* Light red for error messages */
-    font-size: 0.9rem;
-    margin-bottom: 0.5rem;
-  }
-  
-  .retry-btn {
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    border-radius: 20px;
-    padding: 0.5rem 1rem;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .retry-btn:hover {
-    background-color: #0056b3;
-  }
+  background: linear-gradient(135deg, #2C3E50 0%, #1A3C5E 100%);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  color: #fff;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+}
 
-  .see-historic {
-    color: #007bff;
-    cursor: pointer;
-    margin-top: 1rem;
-    text-align: center;
-    text-decoration: none;
-    justify-content: center;
-    display: flex;
-  }
-  
-  .see-historic:hover {
-    text-decoration: underline;
-  } 
+.weather-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.weather-card h3 {
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.weather-time {
+  font-size: 0.9rem;
+  color: #d1d5db;
+  margin-bottom: 0.75rem;
+}
+
+.weather-info {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.weather-icon {
+  font-size: 3rem;
+  color: #FFD700;
+}
+
+.weather-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.temperature {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0;
+  color: #fff;
+}
+
+.weather-condition {
+  font-size: 1rem;
+  line-height: 1.4;
+  color: #d1d5db;
+}
+
+.weather-condition b {
+  font-weight: 600;
+}
+
+.error-message {
+  color: #ff6b6b;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.retry-btn {
+  background-color: var(--primary-color);
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.retry-btn:hover {
+  background-color: var(--secondary-color);
+}
+
+.see-historic {
+  color: var(--secondary-color);
+  cursor: pointer;
+  margin-top: 1rem;
+  text-align: center;
+  text-decoration: none;
+  justify-content: center;
+  display: flex;
+  font-weight: 500;
+}
+
+.see-historic:hover {
+  text-decoration: underline;
+  color: var(--primary-color);
+}
+
+.loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.loading-spinner p {
+  font-size: 0.95rem;
+  color: #d1d5db;
+}
