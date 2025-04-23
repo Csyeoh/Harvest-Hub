@@ -9,17 +9,19 @@ import '../App.css';
 
 const Dashboard = () => {
   return (
-    <><div className="top-row">
-      <CurrentWeather />
-      <NextHarvest />
-      <Markets />
-    </div><div className="mid-row">
+    <div className="dashboard-content">
+      <div className="top-row">
+        <CurrentWeather />
+        <NextHarvest />
+        <Markets />
+      </div>
+      <div className="mid-row">
         <div className="bottom-row">
           <WeatherForecast />
           <SoilStatus />
         </div>
-
-      </div></>
+      </div>
+    </div>
   );
 };
 

@@ -7,7 +7,7 @@
     height: calc(100vh - 60px); /* Full height minus TopNavbar */
     overflow-y: auto; /* Allow scrolling if content overflows */
   }
-  
+
   /* Dashboard content container */
   .dashboard-content {
     display: flex;
@@ -15,14 +15,14 @@
     gap: 20px;
     max-width: 100%; /* Ensure it doesn't overflow */
   }
-  
+
   /* Top row: Weather, Harvest, Markets */
   .top-row {
     display: flex;
     gap: 20px;
     flex-wrap: wrap; /* Allow wrapping on smaller screens */
   }
-  
+
   .weather-card, .harvest-card, .markets-card {
     background-color: white;
     padding-top: 15px;
@@ -39,17 +39,17 @@
     background-color: #1a3c5e;
     color: white;
   }
-  
+
   .weather-info {
     display: flex;
     align-items: top;
     gap: 40px;
   }
-  
+
   .weather-icon {
     font-size: 2.5em;
   }
-  
+
   .weather-time {
     margin-bottom: 9px;
   }
@@ -58,7 +58,7 @@
     font-size: 2em;
     margin: 0;
   }
-  
+
   .harvest-card {
     text-align: left;
   }
@@ -68,24 +68,25 @@
     justify-content: space-between;
   } */
 
-  .harvest-card td{
+  .harvest-card td {
     vertical-align: top;
   }
-  
+
   .progress-circle {
     width: 100px;
     height: 100px;
-    background: conic-gradient(#FFD700 0% 30%, #ddd 30% 100%);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     margin: 10px auto;
     left: 40px;
+    position: relative; /* Ensure ::before pseudo-element positions correctly */
   }
+
   .progress-circle p {
     z-index: 5;
-    text-align:center;
+    text-align: center;
     font-size: small;
     margin-bottom: 0;
   }
@@ -94,7 +95,7 @@
     z-index: 5;
     font-size: small;
   }
-  
+
   .progress-circle::before {
     content: '';
     width: 70px;
@@ -103,17 +104,17 @@
     border-radius: 50%;
     position: absolute;
   }
-  
+
   .markets-card .market-item {
     display: flex;
     justify-content: space-between;
     margin: 10px 0;
   }
-  
+
   .market-value.positive {
     color: green;
   }
-  
+
   /* Weather Forecast */
   .weather-forecast {
     background-color: white;
@@ -123,7 +124,7 @@
     max-width: 100%;
     overflow-x: auto; /* Allow horizontal scrolling if needed */
   }
-  
+
   .forecast-graph {
     display: flex;
     justify-content: space-between;
@@ -131,15 +132,15 @@
     margin: 20px 0;
     min-width: 600px; /* Ensure it doesn't shrink too much */
   }
-  
+
   .forecast-day p {
     margin: 5px 0;
   }
-  
+
   .forecast-icon {
     font-size: 1.5em;
   }
-  
+
   .see-historic {
     color: #4CAF50;
     cursor: pointer;
@@ -148,7 +149,7 @@
   .see-historic p {
     margin-bottom: 0px;
   }
-  
+
   .mid-row {
     padding-top: 20px;
     display: flex;
@@ -163,7 +164,7 @@
     gap: 20px;
     flex-wrap: wrap; /* Allow wrapping on smaller screens */
   }
-  
+
   .calendar-card {
     background-color: white;
     padding: 15px;
@@ -173,7 +174,7 @@
     min-width: 250px; /* Ensure it doesn't shrink too much */
     max-width: 100%;
   }
-  
+
   .calendar-header {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
@@ -181,24 +182,24 @@
     font-weight: bold;
     margin-bottom: 10px;
   }
-  
+
   .calendar-days {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     text-align: center;
     gap: 5px;
   }
-  
+
   .calendar-days span {
     padding: 5px;
     border-radius: 50%;
   }
-  
+
   .calendar-days .today {
     background-color: #60a1e3;
     color: white;
   }
-  
+
   .soil-status {
     display: flex;
     gap: 20px;
@@ -207,7 +208,7 @@
     max-width: 100%;
     flex-wrap: wrap; /* Allow wrapping if needed */
   }
-  
+
   .soil-card-d {
     background-color: white;
     padding: 15px;
@@ -219,12 +220,12 @@
     gap: 10px;
     min-width: 200px;
   }
-  
+
   .soil-icon {
     font-size: 1.5em;
     color: #4CAF50;
   }
-  
+
   .status-excellent {
     color: green;
     font-weight: bold;
