@@ -3,14 +3,15 @@ import { FaTint, FaAtom, FaCloudSun } from 'react-icons/fa';
 import useSoilLogic from './soilLogic';
 import { getDynamicRecommendation } from '../../geminiClient';
 import { sendEmail } from '../../sendEmail';
-import { auth } from './firebase';
+import { auth, db } from './firebase';
+import { doc, setDoc } from 'firebase/firestore';
 
 const SoilStatus = () => {
   const { moistureStatus, phStatus, weather, weatherError, geminiData, geminiError } = useSoilLogic();
 
   useEffect(() => {
     const checkAndNotify = async () => {
-      if (!weather || !moistureStatus || !phStatus || !auth.currentUser) return;
+      if (!weather || !moistureStatus || !phStatus || !auth.currentUser || !geminiData) return;
 
       const userEmail = auth.currentUser.email;
       let isAbnormal = false;
@@ -43,8 +44,19 @@ const SoilStatus = () => {
       }
 
       if (isAbnormal) {
-        const prompt = `Given the following conditions: Weather: ${context.weather.condition}, ${context.weather.temperature}°C; Soil: ${context.soil.moisture} moisture, ${context.soil.pH} pH. Provide a specific, actionable recommendation for farmers in less than 30 words.`;
-        const recommendation = await getDynamicRecommendation(JSON.stringify(context), 'combined', prompt);
+        let recommendation = geminiData.recommendation;
+        if (recommendation === 'No recommendation available due to insufficient data.' || recommendation.includes('Failed to fetch')) {
+          const prompt = `Given the following conditions: Weather: ${context.weather.condition}, ${context.weather.temperature}°C; Soil: ${context.soil.moisture} moisture, ${context.soil.pH} pH. Provide a specific, actionable recommendation for farmers in less than 30 words.`;
+          recommendation = await getDynamicRecommendation(JSON.stringify(context), 'combined', prompt);
+
+          // Cache the new recommendation
+          await setDoc(doc(db, `users/${auth.currentUser.uid}/soilData`, Date.now().toString()), {
+            soilMoisture: moistureStatus.text === 'Dry' ? 200 : moistureStatus.text === 'Wet' ? 800 : 500,
+            phValue: phStatus.text === 'Too Acidic' ? 4.5 : phStatus.text === 'Too Alkaline' ? 8.5 : 6.5,
+            recommendation,
+            createdAt: new Date().toISOString()
+          }, { merge: true });
+        }
 
         const subject = 'Harvest Hub: Abnormal Conditions Alert';
         const body = `
@@ -70,7 +82,7 @@ const SoilStatus = () => {
     };
 
     checkAndNotify();
-  }, [weather, moistureStatus, phStatus]);
+  }, [weather, moistureStatus, phStatus, geminiData]);
 
   return (
     <div className="soil-status">

@@ -1,25 +1,52 @@
 import React, { useState, useEffect } from 'react';
 import { FaLeaf } from 'react-icons/fa';
+import { auth, db } from './firebase';
+import { collection, onSnapshot } from 'firebase/firestore';
 import { fetchMarketData } from '../../geminiClient';
 
 const Markets = () => {
   const [selectedPlant, setSelectedPlant] = useState('Cauliflower');
   const [price, setPrice] = useState(50);
   const [percentageChange, setPercentageChange] = useState(0.08);
+  const [_user, setUser] = useState(null);
 
   useEffect(() => {
-    const profile = localStorage.getItem('selectedPlantProfile');
-    if (profile) {
-      const parsedProfile = JSON.parse(profile);
-      setSelectedPlant(parsedProfile.name !== 'Select Plant Profile' ? parsedProfile.name : 'Cauliflower');
-    }
+    const unsubscribeAuth = auth.onAuthStateChanged((currentUser) => {
+      setUser(currentUser);
+      if (currentUser) {
+        const profilesRef = collection(db, `users/${currentUser.uid}/plantProfiles`);
+        const unsubscribeSnapshot = onSnapshot(profilesRef, (snapshot) => {
+          const profiles = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+          const selectedProfile = profiles.find((p) => p.isSelected) || { 
+            name: 'Select Plant Profile', 
+            startDate: ''
+          };
+          setSelectedPlant(selectedProfile.name !== 'Select Plant Profile' ? selectedProfile.name : 'Cauliflower');
+        }, (err) => {
+          console.error('Error listening to plant profiles:', err);
+          setSelectedPlant('Cauliflower');
+        });
+
+        return () => unsubscribeSnapshot();
+      } else {
+        setSelectedPlant('Cauliflower');
+      }
+    });
+
+    return () => unsubscribeAuth();
   }, []);
 
   useEffect(() => {
     const updateMarketData = async () => {
-      const marketData = await fetchMarketData(selectedPlant);
-      setPrice(marketData.price);
-      setPercentageChange(marketData.percentageChange);
+      try {
+        const marketData = await fetchMarketData(selectedPlant);
+        setPrice(marketData.price);
+        setPercentageChange(marketData.percentageChange);
+      } catch (err) {
+        console.error('Error fetching market data:', err);
+        setPrice(50);
+        setPercentageChange(0.08);
+      }
     };
 
     updateMarketData();

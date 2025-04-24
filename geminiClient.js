@@ -10,6 +10,25 @@ const API_NINJAS_BASE_URL = 'https://api.api-ninjas.com/v1';
 // Fixed USD to MYR exchange rate (approximate for April 2025)
 const USD_TO_MYR = 4.2;
 
+// Retry logic with exponential backoff for Gemini API calls
+const retryWithBackoff = async (fn, maxRetries = 3, baseDelay = 1000) => {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      if (error.message.includes('429') && attempt < maxRetries) {
+        const retryDelay = error.message.match(/"retryDelay":"(\d+)s"/)?.[1];
+        const delay = retryDelay ? parseInt(retryDelay) * 1000 : baseDelay * Math.pow(2, attempt);
+        console.log(`Rate limit hit, retrying after ${delay / 1000} seconds (attempt ${attempt}/${maxRetries})`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      } else {
+        throw error; // Rethrow if not a 429 error or max retries reached
+      }
+    }
+  }
+  throw new Error('Max retries reached');
+};
+
 // Function to predict the harvest date based on plant name and start date
 export const predictHarvestDate = async (plantName, startDate) => {
   try {
@@ -33,7 +52,7 @@ export const predictHarvestDate = async (plantName, startDate) => {
       If the plant name is unknown or invalid, return "Unable to predict".
     `;
 
-    const result = await model.generateContent(prompt);
+    const result = await retryWithBackoff(() => model.generateContent(prompt));
     const response = await result.response;
     let predictedDate = response.text().trim();
 
@@ -63,7 +82,7 @@ export const predictHarvestDate = async (plantName, startDate) => {
 };
 
 // Function to get dynamic recommendations from Gemini API based on context and type
-export const getDynamicRecommendation = async (context, type = 'soil') => {
+export const getDynamicRecommendation = async (context, type = 'soil', customPrompt = null) => {
   try {
     // Validate input parameters
     if (!context) {
@@ -76,21 +95,21 @@ export const getDynamicRecommendation = async (context, type = 'soil') => {
     }
 
     // Validate type
-    const validTypes = ['soil', 'weather', 'crop'];
+    const validTypes = ['soil', 'weather', 'crop', 'combined'];
     if (!validTypes.includes(type)) {
       throw new Error(`Invalid type: ${type}. Must be one of ${validTypes.join(', ')}.`);
     }
 
     const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
-    // Construct the prompt for Gemini
-    const prompt = `
+    // Use custom prompt if provided, otherwise construct default prompt
+    const prompt = customPrompt || `
       Based on the following ${type} data: ${context}, provide a concise recommendation for a farmer to optimize their farming practices. 
       Return only the recommendation as a plain text string, without markdown or additional formatting. 
       If the data is insufficient or unclear, return "Unable to provide recommendation due to insufficient data."
     `;
 
-    const result = await model.generateContent(prompt);
+    const result = await retryWithBackoff(() => model.generateContent(prompt));
     const response = await result.response;
     const recommendation = response.text().trim();
 
@@ -125,7 +144,7 @@ export const estimateSoilData = async (temperature, humidity, recentRainfall) =>
       If the data is insufficient, return {"soilMoisture": 500, "phValue": 6.5}.
     `;
 
-    const result = await model.generateContent(prompt);
+    const result = await retryWithBackoff(() => model.generateContent(prompt));
     const response = await result.response;
     let soilDataText = response.text().trim();
 
@@ -225,7 +244,7 @@ export const fetchMarketData = async (plantName) => {
 
     return {
       price: latestPriceMYR,
-      percentageChange: 0.08, // Default to 0.00 since historical data is not fetched
+      percentageChange: 0.08, // Default to 0.08 since historical data is not fetched
     };
   } catch (error) {
     console.error('Error fetching market data with API-Ninjas:', error.response ? error.response.data : error.message);

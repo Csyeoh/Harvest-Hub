@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
-import { getDynamicRecommendation } from '../../geminiClient';
+import { auth, db } from './firebase';
+import { collection, doc, setDoc, onSnapshot } from 'firebase/firestore';
+import { getDynamicRecommendation, estimateSoilData } from '../../geminiClient';
 
 // Custom hook to manage soil moisture, pH logic, and fetch weather data
 const useSoilLogic = () => {
@@ -9,6 +11,7 @@ const useSoilLogic = () => {
   const [weatherError, setWeatherError] = useState(null);
   const [geminiData, setGeminiData] = useState(null);
   const [geminiError, setGeminiError] = useState(null);
+  const [user, setUser] = useState(null);
 
   const dryThreshold = 300;
   const wetThreshold = 700;
@@ -17,38 +20,51 @@ const useSoilLogic = () => {
 
   const getMoistureStatus = () => {
     if (soilMoisture < dryThreshold) {
-      return { text: "Dry", className: "status-poor" };
+      return { text: 'Dry', className: 'status-poor' };
     } else if (soilMoisture <= wetThreshold) {
-      return { text: "Moist", className: "status-excellent" };
+      return { text: 'Moist', className: 'status-excellent' };
     } else {
-      return { text: "Wet", className: "status-warning" };
+      return { text: 'Wet', className: 'status-warning' };
     }
   };
 
   const getPhStatus = () => {
     if (phValue < acidicThreshold) {
-      return { text: "Too Acidic", className: "status-poor" };
+      return { text: 'Too Acidic', className: 'status-poor' };
     } else if (phValue <= alkalineThreshold) {
-      return { text: "Optimal", className: "status-excellent" };
+      return { text: 'Optimal', className: 'status-excellent' };
     } else {
-      return { text: "Too Alkaline", className: "status-poor" };
+      return { text: 'Too Alkaline', className: 'status-poor' };
     }
   };
+
+  useEffect(() => {
+    const unsubscribeAuth = auth.onAuthStateChanged((currentUser) => {
+      setUser(currentUser);
+      if (!currentUser) {
+        setSoilMoisture(500);
+        setPhValue(6.5);
+        setGeminiData(null);
+        setGeminiError('Please log in');
+      }
+    });
+    return () => unsubscribeAuth();
+  }, []);
 
   useEffect(() => {
     const fetchWeather = async () => {
       try {
         const apiKey = import.meta.env.VITE_OPENWEATHERMAP_API_KEY;
-        const city = import.meta.env.VITE_WEATHER_CITY || "London";
+        const city = import.meta.env.VITE_WEATHER_CITY || 'London';
         const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
         const response = await fetch(url);
         if (!response.ok) {
-          throw new Error("Failed to fetch weather data");
+          throw new Error('Failed to fetch weather data');
         }
         const data = await response.json();
         setWeather(data);
       } catch (error) {
-        console.error("Error fetching weather data:", error);
+        console.error('Error fetching weather data:', error);
         setWeatherError(error.message);
       }
     };
@@ -58,89 +74,64 @@ const useSoilLogic = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const fetchSoilData = async () => {
-    try {
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-      const baseUrl = import.meta.env.VITE_GEMINI_API_URL || "https://generativelanguage.googleapis.com";
-      const response = await fetch(`${baseUrl}/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              role: "user",
-              parts: [
-                {
-                  text: `Estimate soil moisture and pH for a region with the following weather: temperature = ${weather?.main?.temp || 25}°C, humidity = ${weather?.main?.humidity || 60}%, and recent rainfall = ${weather?.weather?.[0]?.main.toLowerCase().includes("rain") ? "yes" : "no"}. Provide the result in JSON format like {"soilMoisture": 500, "phValue": 6.5}. Ensure the response is valid JSON without markdown or additional text.`
-                }
-              ]
-            }
-          ]
-        })
-      });
-      if (!response.ok) {
-        throw new Error("Failed to fetch soil data from Gemini API");
+  useEffect(() => {
+    if (!user || !weather) return;
+
+    const soilDataRef = collection(db, `users/${user.uid}/soilData`);
+    const unsubscribe = onSnapshot(soilDataRef, async (snapshot) => {
+      const soilDataDocs = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      const latestSoilData = soilDataDocs.find((d) => d.createdAt) || { 
+        soilMoisture: 500, 
+        phValue: 6.5, 
+        recommendation: 'N/A',
+        createdAt: null 
+      };
+
+      // Only fetch new data if the cached data is older than 24 hours
+      const isCacheValid = latestSoilData.createdAt && 
+        (Date.now() - new Date(latestSoilData.createdAt).getTime()) < 24 * 60 * 60 * 1000;
+
+      if (isCacheValid) {
+        setSoilMoisture(latestSoilData.soilMoisture);
+        setPhValue(latestSoilData.phValue);
+        setGeminiData({ recommendation: latestSoilData.recommendation });
+        setGeminiError(null);
+        return;
       }
-      const data = await response.json();
-      const generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (!generatedText) {
-        throw new Error("No generated text received from Gemini API");
-      }
-      console.log('Raw Gemini API Soil Data Response:', generatedText);
+
       try {
-        let cleanedText = generatedText.trim();
-        if (cleanedText.startsWith('```json') && cleanedText.endsWith('```')) {
-          cleanedText = cleanedText.slice(7, -3).trim();
-        }
-        const soilData = JSON.parse(cleanedText);
-        if (!soilData.soilMoisture || !soilData.phValue) {
-          throw new Error("Invalid soil data format: 'soilMoisture' or 'phValue' missing");
-        }
+        const soilData = await estimateSoilData(
+          weather.main.temp,
+          weather.main.humidity,
+          weather.weather[0].main.toLowerCase().includes('rain') ? 'yes' : 'no'
+        );
+
+        const context = `Soil data: moisture = ${soilData.soilMoisture}, pH = ${soilData.phValue}.`;
+        const recommendation = await getDynamicRecommendation(context, 'soil');
+
+        // Cache the results in Firestore
+        await setDoc(doc(db, `users/${user.uid}/soilData`, Date.now().toString()), {
+          soilMoisture: soilData.soilMoisture,
+          phValue: soilData.phValue,
+          recommendation: recommendation || 'No recommendation available due to insufficient data.',
+          createdAt: new Date().toISOString()
+        });
+
         setSoilMoisture(soilData.soilMoisture);
         setPhValue(soilData.phValue);
-      } catch (parseError) {
-        console.error("Error parsing Gemini API soil data response:", parseError);
-        setSoilMoisture(500);
-        setPhValue(6.5);
-      }
-    } catch (error) {
-      console.error("Error fetching soil data from Gemini API:", error);
-      setSoilMoisture(500);
-      setPhValue(6.5);
-    }
-  };
-
-  useEffect(() => {
-    if (weather) {
-      fetchSoilData();
-    }
-  }, [weather]);
-
-  useEffect(() => {
-    const interval = setInterval(fetchSoilData, 3600000);
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    const fetchGeminiData = async () => {
-      try {
-        const context = `Soil data: moisture = ${soilMoisture}, pH = ${phValue}.`;
-        const recommendation = await getDynamicRecommendation(context, 'soil');
         setGeminiData({ recommendation });
         setGeminiError(null);
       } catch (error) {
-        console.error("Error fetching Gemini recommendation:", error);
+        console.error('Error fetching soil data or recommendation:', error);
+        setSoilMoisture(500);
+        setPhValue(6.5);
         setGeminiError(error.message);
-        setGeminiData({ recommendation: "Failed to fetch recommendation: API error." });
+        setGeminiData({ recommendation: 'Failed to fetch recommendation: API error.' });
       }
-    };
+    });
 
-    fetchGeminiData();
-    const interval = setInterval(fetchGeminiData, 3600000);
-    return () => clearInterval(interval);
-  }, [soilMoisture, phValue]);
+    return () => unsubscribe();
+  }, [user, weather]);
 
   return {
     moistureStatus: getMoistureStatus(),
