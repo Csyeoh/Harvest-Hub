@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { FaCloudSun, FaSun, FaCloudRain, FaCloud, FaSnowflake } from 'react-icons/fa';
 import axios from 'axios';
-import { auth, db } from '../components/firebase'; // Import Firebase
+import { auth, db } from './firebase';
 import { doc, getDoc } from 'firebase/firestore';
+import { ClipLoader } from 'react-spinners';
 import './CurrentWeather.css';
 
 const CurrentWeather = () => {
   const [weatherData, setWeatherData] = useState(null);
-  const [location, setLocation] = useState('Penang'); // Default location
+  const [location, setLocation] = useState('Penang');
   const [inputLocation, setInputLocation] = useState('');
   const [currentTime, setCurrentTime] = useState(new Date());
   const [loading, setLoading] = useState(false);
@@ -17,7 +18,6 @@ const CurrentWeather = () => {
   const GEOCODING_API_URL = 'http://api.openweathermap.org/geo/1.0/direct';
   const CURRENT_WEATHER_API_URL = 'https://api.openweathermap.org/data/2.5/weather';
 
-  // Fetch user location from Firestore
   useEffect(() => {
     const fetchUserLocation = async () => {
       const user = auth.currentUser;
@@ -25,23 +25,21 @@ const CurrentWeather = () => {
         try {
           const userDoc = await getDoc(doc(db, 'users', user.uid));
           const userLocation = userDoc.exists() ? userDoc.data().location : '';
-          setLocation(userLocation || 'Penang'); // Default to Penang if not set
+          setLocation(userLocation || 'Penang');
         } catch (err) {
           console.error('Error fetching user location:', err);
-          setLocation('Penang'); // Fallback to Penang
+          setLocation('Penang');
         }
       }
     };
     fetchUserLocation();
   }, []);
 
-  // Check for missing API key
   if (!OPENWEATHERMAP_API_KEY) {
     console.error('OpenWeatherMap API key is missing. Please set VITE_OPENWEATHERMAP_API_KEY in your .env file.');
     setError('Error: OpenWeatherMap API key is missing. Please contact support.');
   }
 
-  // Update current time every minute
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
@@ -120,7 +118,12 @@ const CurrentWeather = () => {
   return (
     <div className="weather-card">
       <h3>Current Weather in {location}</h3>
-      {loading && <p>Loading weather...</p>}
+      {loading && (
+        <div className="loading-spinner">
+          <ClipLoader color={getComputedStyle(document.documentElement).getPropertyValue('--primary-color')} size={30} />
+          <p>Loading weather...</p>
+        </div>
+      )}
       {error && (
         <div>
           <p className="error-message">{error}</p>

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Navbar, Nav, Form, FormControl, Dropdown, Modal, Button, Form as BootstrapForm } from 'react-bootstrap';
-import { auth, db } from './firebase'; // Import db and auth
-import { doc, getDoc, updateDoc } from 'firebase/firestore'; // Firestore methods
-import { signOut } from 'firebase/auth'; // Import signOut from Firebase
-import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
+import { auth, db } from './firebase';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { signOut } from 'firebase/auth';
+import { useNavigate } from 'react-router-dom';
 import './dashboard-top.css';
 
 const TopNavbar = () => {
@@ -12,30 +12,25 @@ const TopNavbar = () => {
   const [userData, setUserData] = useState({ name: '', email: '', location: '' });
   const [newLocation, setNewLocation] = useState('');
   const [error, setError] = useState('');
-  const navigate = useNavigate(); // Hook for navigation
+  const navigate = useNavigate();
 
-  // Fetch user data when component mounts
   useEffect(() => {
     const fetchUserData = async () => {
       const user = auth.currentUser;
       if (user) {
-        // Fetch name and email from Firebase Auth
         const name = user.displayName || 'Unknown';
         const email = user.email || 'No email';
-
-        // Fetch location from Firestore
         try {
           const userDoc = await getDoc(doc(db, 'users', user.uid));
           const location = userDoc.exists() ? userDoc.data().location || '' : '';
           setUserData({ name, email, location });
-          setNewLocation(location); // Set initial value for the input
+          setNewLocation(location);
         } catch (err) {
           console.error('Error fetching user data:', err);
           setError('Failed to fetch user data.');
         }
       }
     };
-
     fetchUserData();
   }, []);
 
@@ -55,16 +50,14 @@ const TopNavbar = () => {
     }
   };
 
-  // Handle navigation to Settings page
   const handleSettingsNavigation = () => {
     navigate('/dashboard/settings');
   };
 
-  // Handle logout
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      navigate('/login'); // Redirect to login page after logout
+      navigate('/login');
     } catch (err) {
       console.error('Error logging out:', err);
       setError('Failed to log out. Please try again.');
@@ -74,10 +67,7 @@ const TopNavbar = () => {
   return (
     <Navbar bg="dark" variant="dark" fixed="top" className="top-navbar">
       <div className="container-fluid justify-content-center">
-        {/* Empty space on left to account for sidebar */}
         <div style={{ width: '250px' }}></div>
-
-        {/* Search Bar */}
         <Form className="d-flex mx-auto search-form">
           <FormControl
             type="search"
@@ -86,48 +76,24 @@ const TopNavbar = () => {
             aria-label="Search"
           />
         </Form>
-
-        {/* Right Side Icons */}
         <Nav className="ms-auto align-items-center">
-          {/* Notification Bell with Dropdown */}
-          <Dropdown className="mx-3 notification-dropdown">
-            <Dropdown.Toggle 
-              as={Nav.Link} 
-              className="p-0 notification-toggle"
-              variant="link"
-            >
-              <i className="bi bi-bell"></i>
-              <span className="badge rounded-pill bg-danger notification-badge">
-                3
-                <span className="visually-hidden">unread notifications</span>
-              </span>
-            </Dropdown.Toggle>
-
-            <Dropdown.Menu align="end" className="mt-2 notification-menu">
-              <Dropdown.ItemText>Notification History</Dropdown.ItemText>
-              <Dropdown.Divider />
-              <Dropdown.Item href="#notification1">
-                Irrigation system alert - 10:30 AM
-              </Dropdown.Item>
-              <Dropdown.Item href="#notification2">
-                Weather warning - 9:15 AM
-              </Dropdown.Item>
-              <Dropdown.Item href="#notification3">
-                Harvest reminder - Yesterday
-              </Dropdown.Item>
-            </Dropdown.Menu>
-          </Dropdown>
-
+          {/* Email Icon */}
+          <Nav.Link
+            href={`mailto:${userData.email}`}
+            className="mx-3 email-icon"
+            title="Open Mailbox"
+          >
+            <i className="bi bi-envelope"></i>
+          </Nav.Link>
           {/* Translation Button with Dropdown */}
           <Dropdown className="mx-3 translation-dropdown">
-            <Dropdown.Toggle 
-              as={Nav.Link} 
+            <Dropdown.Toggle
+              as={Nav.Link}
               className="p-0 translation-toggle"
               variant="link"
             >
               <i className="bi bi-globe"></i>
             </Dropdown.Toggle>
-
             <Dropdown.Menu align="end" className="mt-2 translation-menu">
               <Dropdown.ItemText>Select Language</Dropdown.ItemText>
               <Dropdown.Divider />
@@ -142,21 +108,19 @@ const TopNavbar = () => {
               </Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
-
           {/* Profile Dropdown with Image */}
           <Dropdown align="end" className="mx-3">
-            <Dropdown.Toggle 
-              as={Nav.Link} 
+            <Dropdown.Toggle
+              as={Nav.Link}
               className="profile-dropdown p-0"
               variant="link"
             >
-              <img 
+              <img
                 src="../hhbot.svg"
-                alt="Profile" 
+                alt="Profile"
                 className="profile-img"
               />
             </Dropdown.Toggle>
-
             <Dropdown.Menu className="mt-2">
               <Dropdown.Item onClick={() => setShowProfileModal(true)}>
                 Profile
@@ -172,8 +136,6 @@ const TopNavbar = () => {
           </Dropdown>
         </Nav>
       </div>
-
-      {/* Profile Modal */}
       <Modal show={showProfileModal} onHide={() => setShowProfileModal(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>User Profile</Modal.Title>

@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { FaLeaf } from 'react-icons/fa';
+import { fetchMarketData } from '../../geminiClient';
 
 const Markets = () => {
-  const [selectedPlant, setSelectedPlant] = useState('Cauliflower'); // Default to Cauliflower
+  const [selectedPlant, setSelectedPlant] = useState('Cauliflower');
+  const [price, setPrice] = useState(50);
+  const [percentageChange, setPercentageChange] = useState(0.08);
 
-  // Fetch the selected plant profile from localStorage
   useEffect(() => {
     const profile = localStorage.getItem('selectedPlantProfile');
     if (profile) {
@@ -12,16 +15,34 @@ const Markets = () => {
     }
   }, []);
 
+  useEffect(() => {
+    const updateMarketData = async () => {
+      const marketData = await fetchMarketData(selectedPlant);
+      setPrice(marketData.price);
+      setPercentageChange(marketData.percentageChange);
+    };
+
+    updateMarketData();
+    const interval = setInterval(updateMarketData, 300000);
+
+    return () => clearInterval(interval);
+  }, [selectedPlant]);
+
   return (
-    <div className="markets-card">
-      <h3>Current Price</h3>
+    <div className="markets-card fade-in">
+      <h3>
+        <FaLeaf style={{ marginRight: '8px', color: 'var(--secondary-color)' }} />
+        Current Price
+      </h3>
       <div className="market-item">
-        <p>{selectedPlant}</p>
-        <p className="">RM/kg</p>
+        <p className="plant-name">{selectedPlant}</p>
+        <p className="unit">RM/kg</p>
       </div>
-      <div className="market-item">
-        <p className='market-value positive'>+0.08%</p>
-        <p className="market-value">50</p>
+      <div className="market-item values">
+        <p className={`market-value ${percentageChange >= 0 ? 'positive' : 'negative'}`}>
+          {percentageChange >= 0 ? '+' : ''}{percentageChange}%
+        </p>
+        <p className="market-value price">{price}</p>
       </div>
     </div>
   );
