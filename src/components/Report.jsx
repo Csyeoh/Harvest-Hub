@@ -1,6 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Modal, Button } from 'react-bootstrap';
-import { auth } from '../components/firebase';
+import { auth, db } from '../components/firebase';
+import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
 import './Report.css';
 
 function Report() {
@@ -21,9 +22,11 @@ function Report() {
   const [report, setReport] = useState(null);
   const [showReportModal, setShowReportModal] = useState(false);
   const reportRef = useRef();
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(user => {
+      setUser(user);
       if (user) {
         setLoggedInFarmer(user.displayName || 'Unknown Farmer');
       } else {
@@ -37,33 +40,28 @@ function Report() {
     localStorage.setItem('reportFormData', JSON.stringify(formData));
   }, [formData]);
 
-  useEffect(() => {
-    const handleStorageChange = () => {
-      const profile = localStorage.getItem('selectedPlantProfile');
-      const newProfile = profile ? JSON.parse(profile) : { name: 'Not selected', startDate: '' };
-      setSelectedPlantProfile(newProfile);
-      if (report) {
-        const { pesticideDates, fertilizerDates, images, totalPesticideAmount, totalFertilizerAmount } = fetchCalendarDataInRange(newProfile.startDate, report.plantingEnd);
-        const pesticideColumns = splitIntoColumns(pesticideDates);
-        const fertilizerColumns = splitIntoColumns(fertilizerDates);
-        setReport({
-          ...report,
-          plant: newProfile.name,
-          plantingStart: newProfile.startDate,
-          pesticideColumns,
-          fertilizerColumns,
-          imagesInRange: images,
-          totalPesticideAmount,
-          totalFertilizerAmount,
-        });
-      }
-    };
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, [report]);
+  const fetchCalendarDataInRange = useCallback(async (startDate, endDate) => {
+    if (!startDate || !endDate || !user) {
+      return { pesticideDates: [], fertilizerDates: [], images: [], totalPesticideAmount: 0, totalFertilizerAmount: 0 };
+    }
+    
+    // Find the selected plant profile ID
+    const profilesRef = collection(db, `users/${user.uid}/plantProfiles`);
+    let plantProfileId = null;
+    try {
+      const profilesSnapshot = await getDocs(profilesRef);
+      const profiles = profilesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const selectedProfile = profiles.find(p => p.isSelected && p.name === selectedPlantProfile.name && p.startDate === selectedPlantProfile.startDate);
+      plantProfileId = selectedProfile ? selectedProfile.id : null;
+    } catch (err) {
+      console.error('Error fetching plant profiles:', err);
+      return { pesticideDates: [], fertilizerDates: [], images: [], totalPesticideAmount: 0, totalFertilizerAmount: 0 };
+    }
 
-  const fetchCalendarDataInRange = (startDate, endDate) => {
-    if (!startDate || !endDate) return { pesticideDates: [], fertilizerDates: [], images: [], totalPesticideAmount: 0, totalFertilizerAmount: 0 };
+    if (!plantProfileId) {
+      return { pesticideDates: [], fertilizerDates: [], images: [], totalPesticideAmount: 0, totalFertilizerAmount: 0 };
+    }
+
     const start = new Date(startDate);
     const end = new Date(endDate);
     const pesticideDates = [];
@@ -74,42 +72,70 @@ function Report() {
 
     let current = new Date(start);
     while (current <= end) {
-      const year = current.getFullYear();
-      const month = current.getMonth();
-      const day = current.getDate();
-      const key = `dailyData_${year}_${month}`;
-      const dailyData = localStorage.getItem(key);
-      if (dailyData) {
-        const parsedData = JSON.parse(dailyData);
-        const dateStr = current.toISOString().split('T')[0];
-        if (parsedData[day]?.pesticide) {
-          pesticideDates.push({
-            date: dateStr,
-            type: parsedData[day].pesticideType || 'Not specified',
-            amount: parsedData[day].pesticideAmount || 0,
-          });
-          totalPesticideAmount += Number(parsedData[day].pesticideAmount) || 0;
+      const dateStr = current.toISOString().split('T')[0]; // YYYY-MM-DD
+      const calendarDocRef = doc(db, `users/${user.uid}/plantProfiles/${plantProfileId}/calendar`, dateStr);
+      
+      try {
+        const docSnap = await getDoc(calendarDocRef);
+        if (docSnap.exists()) {
+          const dailyData = docSnap.data();
+          if (dailyData.pesticide) {
+            pesticideDates.push({
+              date: dateStr,
+              type: dailyData.pesticideType || 'Not specified',
+              amount: dailyData.pesticideAmount || 0,
+            });
+            totalPesticideAmount += Number(dailyData.pesticideAmount) || 0;
+          }
+          if (dailyData.fertilizer) {
+            fertilizerDates.push({
+              date: dateStr,
+              type: dailyData.fertilizerType || 'Not specified',
+              amount: dailyData.fertilizerAmount || 0,
+            });
+            totalFertilizerAmount += Number(dailyData.fertilizerAmount) || 0;
+          }
+          if (dailyData.image) {
+            images.push({
+              date: dateStr,
+              url: dailyData.image,
+            });
+          }
         }
-        if (parsedData[day]?.fertilizer) {
-          fertilizerDates.push({
-            date: dateStr,
-            type: parsedData[day].fertilizerType || 'Not specified',
-            amount: parsedData[day].fertilizerAmount || 0,
-          });
-          totalFertilizerAmount += Number(parsedData[day].fertilizerAmount) || 0;
-        }
-        if (parsedData[day]?.image) {
-          images.push({
-            date: dateStr,
-            url: parsedData[day].image,
-          });
-        }
+      } catch (err) {
+        console.error(`Error fetching calendar data for ${dateStr}:`, err);
       }
       current.setDate(current.getDate() + 1);
     }
 
     return { pesticideDates, fertilizerDates, images, totalPesticideAmount, totalFertilizerAmount };
-  };
+  }, [user, selectedPlantProfile]);
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const profile = localStorage.getItem('selectedPlantProfile');
+      const newProfile = profile ? JSON.parse(profile) : { name: 'Not selected', startDate: '' };
+      setSelectedPlantProfile(newProfile);
+      if (report) {
+        fetchCalendarDataInRange(newProfile.startDate, report.plantingEnd).then(({ pesticideDates, fertilizerDates, images, totalPesticideAmount, totalFertilizerAmount }) => {
+          const pesticideColumns = splitIntoColumns(pesticideDates);
+          const fertilizerColumns = splitIntoColumns(fertilizerDates);
+          setReport({
+            ...report,
+            plant: newProfile.name,
+            plantingStart: newProfile.startDate,
+            pesticideColumns,
+            fertilizerColumns,
+            imagesInRange: images,
+            totalPesticideAmount,
+            totalFertilizerAmount,
+          });
+        });
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, [report, fetchCalendarDataInRange]);
 
   const splitIntoColumns = (dates, maxRowsPerColumn = 10) => {
     const columns = [];
@@ -120,7 +146,7 @@ function Report() {
         currentColumn.push(dates[i]);
       } else {
         columns.push(currentColumn);
-        currentColumn = [dates[i]];
+        currentColumn = (dates[i]);
       }
     }
 
@@ -131,13 +157,13 @@ function Report() {
     return columns;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!selectedPlantProfile.startDate) {
       alert('Please select a plant profile from the sidebar.');
       return;
     }
-    const { pesticideDates, fertilizerDates, images, totalPesticideAmount, totalFertilizerAmount } = fetchCalendarDataInRange(selectedPlantProfile.startDate, formData.plantingEnd);
+    const { pesticideDates, fertilizerDates, images, totalPesticideAmount, totalFertilizerAmount } = await fetchCalendarDataInRange(selectedPlantProfile.startDate, formData.plantingEnd);
     const pesticideColumns = splitIntoColumns(pesticideDates);
     const fertilizerColumns = splitIntoColumns(fertilizerDates);
 

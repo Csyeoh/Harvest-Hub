@@ -1,17 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import { Container, Row, Col, Nav, Button, ListGroup, Modal, Form } from 'react-bootstrap';
-import { auth } from '../components/firebase'; // Import Firebase auth
+import { auth, db } from '../components/firebase'; // Import Firebase auth
 import { updatePassword, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth'; // Import necessary Firebase functions
+import { collection, doc, setDoc, onSnapshot } from 'firebase/firestore';
 import './Setting-component.css';
 
 const SettingsComp = () => {
   const [activeTab, setActiveTab] = useState('devices');
-  const [devices, setDevices] = useState([
-    { name: 'Laptop', description: 'Work laptop' },
-    { name: 'Phone', description: 'Personal phone' },
-  ]);
+  const [devices, setDevices] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showRemoveModal, setShowRemoveModal] = useState(false);
   const [deviceToRemove, setDeviceToRemove] = useState(null);
@@ -21,13 +19,44 @@ const SettingsComp = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [user, setUser] = useState(null);
   const appVersion = '1.0.0';
 
-  const handleAddDevice = () => {
-    if (newDevice.name.trim()) {
-      setDevices([...devices, newDevice]);
-      setNewDevice({ name: '', description: '' });
-      setShowAddModal(false);
+  useEffect(() => {
+    const unsubscribeAuth = auth.onAuthStateChanged((currentUser) => {
+      setUser(currentUser);
+      if (currentUser) {
+        const devicesRef = collection(db, `users/${currentUser.uid}/devices`);
+        const unsubscribeSnapshot = onSnapshot(devicesRef, (snapshot) => {
+          const deviceList = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+          setDevices(deviceList);
+        }, (err) => {
+          console.error('Error fetching devices from Firestore:', err);
+          setDevices([]); // Fallback to empty array on error
+        });
+        return () => unsubscribeSnapshot();
+      } else {
+        setDevices([]); // Clear devices if no user is logged in
+      }
+    });
+    return () => unsubscribeAuth();
+  }, []);
+
+  const handleAddDevice = async () => {
+    if (newDevice.name.trim() && user) {
+      try {
+        const deviceId = Date.now().toString(); // Use timestamp as unique ID
+        await setDoc(doc(db, `users/${user.uid}/devices`, deviceId), {
+          name: newDevice.name,
+          description: newDevice.description,
+          createdAt: new Date().toISOString()
+        });
+        setNewDevice({ name: '', description: '' });
+        setShowAddModal(false);
+      } catch (err) {
+        console.error('Error adding device to Firestore:', err);
+        setError('Failed to add device. Please try again.');
+      }
     }
   };
 
@@ -36,10 +65,20 @@ const SettingsComp = () => {
     setShowRemoveModal(true);
   };
 
-  const handleRemoveDevice = () => {
-    setDevices(devices.filter((_, i) => i !== deviceToRemove));
-    setShowRemoveModal(false);
-    setDeviceToRemove(null);
+  const handleRemoveDevice = async () => {
+    if (user && deviceToRemove !== null) {
+      try {
+        const deviceId = devices[deviceToRemove].id;
+        await setDoc(doc(db, `users/${user.uid}/devices`, deviceId), {
+          deleted: true
+        }, { merge: true });
+        setShowRemoveModal(false);
+        setDeviceToRemove(null);
+      } catch (err) {
+        console.error('Error removing device from Firestore:', err);
+        setError('Failed to remove device. Please try again.');
+      }
+    }
   };
 
   const handlePasswordChange = async (e) => {
@@ -136,9 +175,9 @@ const SettingsComp = () => {
                   Add Device
                 </Button>
                 <ListGroup className="device-list">
-                  {devices.map((device, index) => (
+                  {devices.filter(device => !device.deleted).map((device, index) => (
                     <ListGroup.Item
-                      key={index}
+                      key={device.id}
                       className="d-flex justify-content-between align-items-center"
                     >
                       <div>

@@ -31,13 +31,17 @@ const interpolateColor = (color1, color2, factor) => {
 
 // Calculate the progress color based on percentage
 const getProgressColor = (progress) => {
-  if (progress <= 50) {
-    // Red (#FF0000) to Yellow (#FFFF00)
-    const factor = progress / 50;
-    return interpolateColor('#FF0000', '#FFFF00', factor);
+  if (progress <= 33) {
+    // Red (#FF0000) to Orange (#FFA500)
+    const factor = progress / 33;
+    return interpolateColor('#FF0000', '#FFA500', factor);
+  } else if (progress <= 66) {
+    // Orange (#FFA500) to Yellow (#FFFF00)
+    const factor = (progress - 33) / 33;
+    return interpolateColor('#FFA500', '#FFFF00', factor);
   } else {
     // Yellow (#FFFF00) to Green (#00FF00)
-    const factor = (progress - 50) / 50;
+    const factor = (progress - 66) / 34;
     return interpolateColor('#FFFF00', '#00FF00', factor);
   }
 };
