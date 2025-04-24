@@ -4,6 +4,7 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './index.css'
 import App from './App.jsx'
+import './i18n';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode> 
