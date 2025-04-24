@@ -229,3 +229,16 @@
     color: green;
     font-weight: bold;
   }
+
+  .status-poor {
+    color: red;
+    font-weight: bold;
+  }
+  .status-warning {
+    color: orange;
+    font-weight: bold;
+  }
+  .status-excellent {
+    color: green;
+    font-weight: bold;
+  }
