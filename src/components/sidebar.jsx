@@ -2,60 +2,103 @@ import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Nav, Navbar, NavDropdown, Modal, Button, Form } from 'react-bootstrap';
 import { Link, NavLink } from 'react-router-dom';
+import { auth, db } from './firebase';
+import { collection, addDoc, getDocs, deleteDoc, doc, writeBatch } from 'firebase/firestore';
 import './Sidebar.css';
 
 const Sidebar = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showRemoveModal, setShowRemoveModal] = useState(false);
   const [plantName, setPlantName] = useState('');
-  const [creationDate, setCreationDate] = useState(''); // New state for creation date
+  const [creationDate, setCreationDate] = useState('');
   const [plantToRemove, setPlantToRemove] = useState(null);
-  const [plantProfiles, setPlantProfiles] = useState(() => {
-    return JSON.parse(localStorage.getItem('plantProfiles') || '[]');
-  });
-  const [selectedPlantProfile, setSelectedPlantProfile] = useState(() => {
-    const profile = localStorage.getItem('selectedPlantProfile');
-    return profile ? JSON.parse(profile) : { name: 'Select Plant Profile', startDate: '' };
-  });
+  const [plantProfiles, setPlantProfiles] = useState([]);
+  const [selectedPlantProfile, setSelectedPlantProfile] = useState({ name: 'Select Plant Profile', startDate: '' });
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    localStorage.setItem('plantProfiles', JSON.stringify(plantProfiles));
-  }, [plantProfiles]);
-
-  useEffect(() => {
-    const handleStorageChange = () => {
-      const profile = localStorage.getItem('selectedPlantProfile');
-      setSelectedPlantProfile(profile ? JSON.parse(profile) : { name: 'Select Plant Profile', startDate: '' });
-    };
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    const unsubscribe = auth.onAuthStateChanged((currentUser) => {
+      setUser(currentUser);
+      if (currentUser) {
+        fetchPlantProfiles(currentUser.uid);
+      } else {
+        setPlantProfiles([]);
+        setSelectedPlantProfile({ name: 'Select Plant Profile', startDate: '' });
+      }
+    });
+    return () => unsubscribe();
   }, []);
 
-  const handleAddPlantProfile = () => {
-    if (plantName.trim() && creationDate) {
-      const newProfile = { name: plantName, startDate: creationDate };
-      setPlantProfiles(prev => [...prev, newProfile]);
-      setPlantName('');
-      setCreationDate(''); // Reset creation date
-      setShowAddModal(false);
-    } else {
-      alert('Please provide both a plant name and a creation date.');
+  const fetchPlantProfiles = async (userId) => {
+    try {
+      const profilesRef = collection(db, `users/${userId}/plantProfiles`);
+      const snapshot = await getDocs(profilesRef);
+      const profiles = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      setPlantProfiles(profiles);
+
+      const selected = profiles.find((p) => p.isSelected) || profiles[0] || { name: 'Select Plant Profile', startDate: '' };
+      setSelectedPlantProfile(selected);
+    } catch (err) {
+      console.error('Error fetching plant profiles:', err);
     }
   };
 
-  const handleRemovePlantProfile = () => {
-    if (plantToRemove) {
-      setPlantProfiles(prev => {
-        const updatedProfiles = prev.filter(profile => profile.name !== plantToRemove.name);
-        if (selectedPlantProfile.name === plantToRemove.name) {
-          const newSelected = { name: 'Select Plant Profile', startDate: '' };
-          localStorage.setItem('selectedPlantProfile', JSON.stringify(newSelected));
-          setSelectedPlantProfile(newSelected);
-        }
-        return updatedProfiles;
-      });
-      setPlantToRemove(null);
-      setShowRemoveModal(false);
+  const handleAddPlantProfile = async () => {
+    if (plantName.trim() && creationDate && user) {
+      try {
+        const newProfile = { 
+          name: plantName, 
+          startDate: creationDate, 
+          isSelected: plantProfiles.length === 0,
+        };
+        const profilesRef = collection(db, `users/${user.uid}/plantProfiles`);
+        await addDoc(profilesRef, newProfile);
+        setPlantName('');
+        setCreationDate('');
+        setShowAddModal(false);
+        fetchPlantProfiles(user.uid);
+      } catch (err) {
+        console.error('Error adding plant profile:', err);
+        alert('Failed to add plant profile.');
+      }
+    } else {
+      alert('Please provide both a plant name and a creation date, and ensure you are logged in.');
+    }
+  };
+
+  const handleRemovePlantProfile = async () => {
+    if (plantToRemove && user) {
+      try {
+        const profileRef = doc(db, `users/${user.uid}/plantProfiles`, plantToRemove.id);
+        await deleteDoc(profileRef);
+        fetchPlantProfiles(user.uid);
+        setPlantToRemove(null);
+        setShowRemoveModal(false);
+      } catch (err) {
+        console.error('Error removing plant profile:', err);
+        alert('Failed to remove plant profile.');
+      }
+    }
+  };
+
+  const handleSelectPlantProfile = async (profile) => {
+    if (user) {
+      try {
+        const profilesRef = collection(db, `users/${user.uid}/plantProfiles`);
+        const snapshot = await getDocs(profilesRef);
+
+        const batch = writeBatch(db);
+        snapshot.docs.forEach((doc) => {
+          batch.update(doc.ref, { isSelected: doc.id === profile.id });
+        });
+        await batch.commit();
+
+        setSelectedPlantProfile(profile);
+        fetchPlantProfiles(user.uid);
+      } catch (err) {
+        console.error('Error selecting plant profile:', err);
+        alert('Failed to select plant profile. Please try again.');
+      }
     }
   };
 
@@ -83,13 +126,10 @@ const Sidebar = () => {
             className="mb-2 plant-profile-dropdown"
           >
             {plantProfiles.length > 0 ? (
-              plantProfiles.map((profile, index) => (
+              plantProfiles.map((profile) => (
                 <NavDropdown.Item 
-                  key={index} 
-                  onClick={() => {
-                    localStorage.setItem('selectedPlantProfile', JSON.stringify(profile));
-                    setSelectedPlantProfile(profile);
-                  }}
+                  key={profile.id} 
+                  onClick={() => handleSelectPlantProfile(profile)}
                 >
                   {profile.name} (Created: {profile.startDate})
                 </NavDropdown.Item>
@@ -193,8 +233,8 @@ const Sidebar = () => {
                 }}
               >
                 <option value="">Select a profile</option>
-                {plantProfiles.map((profile, index) => (
-                  <option key={index} value={profile.name}>
+                {plantProfiles.map((profile) => (
+                  <option key={profile.id} value={profile.name}>
                     {profile.name} (Created: {profile.startDate})
                   </option>
                 ))}

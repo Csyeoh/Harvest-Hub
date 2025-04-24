@@ -1,22 +1,71 @@
 import React, { useState, useEffect } from 'react';
 import Calendar from '../components/CalendarComp';
+import { auth, db } from '../components/firebase';
+import { collection, doc, setDoc, onSnapshot } from 'firebase/firestore';
 import './CalendarDash.css';
 
 function CalendarDash() {
   const currentDate = new Date();
   const [currentMonth, setCurrentMonth] = useState(currentDate.getMonth());
   const [currentYear, setCurrentYear] = useState(currentDate.getFullYear());
-
-  const [dailyData, setDailyData] = useState(() => {
-    const savedData = localStorage.getItem(`dailyData_${currentYear}_${currentMonth}`);
-    return savedData ? JSON.parse(savedData) : {};
-  });
-
+  const [dailyData, setDailyData] = useState({});
   const [selectedDay, setSelectedDay] = useState(null);
+  const [selectedPlantProfile, setSelectedPlantProfile] = useState(null);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    localStorage.setItem(`dailyData_${currentYear}_${currentMonth}`, JSON.stringify(dailyData));
-  }, [dailyData, currentYear, currentMonth]);
+    const unsubscribeAuth = auth.onAuthStateChanged((currentUser) => {
+      setUser(currentUser);
+      if (currentUser) {
+        // Listen for selected plant profile
+        const profilesRef = collection(db, `users/${currentUser.uid}/plantProfiles`);
+        const unsubscribeProfiles = onSnapshot(profilesRef, (snapshot) => {
+          const profiles = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+          const selected = profiles.find((p) => p.isSelected) || null;
+          setSelectedPlantProfile(selected);
+        }, (err) => {
+          console.error('Error fetching plant profiles:', err);
+          setSelectedPlantProfile(null);
+        });
+
+        return () => unsubscribeProfiles();
+      } else {
+        setSelectedPlantProfile(null);
+        setDailyData({});
+        setSelectedDay(null);
+      }
+    });
+    return () => unsubscribeAuth();
+  }, []);
+
+  useEffect(() => {
+    if (user && selectedPlantProfile) {
+      // Listen for calendar data for the current month
+      const _startDate = new Date(currentYear, currentMonth, 1);
+      const _endDate = new Date(currentYear, currentMonth + 1, 0);
+      const calendarRef = collection(db, `users/${user.uid}/plantProfiles/${selectedPlantProfile.id}/calendar`);
+      
+      const unsubscribeCalendar = onSnapshot(calendarRef, (snapshot) => {
+        const data = {};
+        snapshot.docs.forEach((doc) => {
+          const date = doc.id; // YYYY-MM-DD
+          const [year, month] = date.split('-').map(Number);
+          if (year === currentYear && month - 1 === currentMonth) {
+            const day = parseInt(date.split('-')[2], 10);
+            data[day] = doc.data();
+          }
+        });
+        setDailyData(data);
+      }, (err) => {
+        console.error('Error fetching calendar data:', err);
+        setDailyData({});
+      });
+
+      return () => unsubscribeCalendar();
+    } else {
+      setDailyData({});
+    }
+  }, [user, selectedPlantProfile, currentYear, currentMonth]);
 
   const handlePrevMonth = () => {
     if (currentMonth === 0) {
@@ -25,10 +74,6 @@ function CalendarDash() {
     } else {
       setCurrentMonth(prevMonth => prevMonth - 1);
     }
-    const newYear = currentMonth === 0 ? currentYear - 1 : currentYear;
-    const newMonth = currentMonth === 0 ? 11 : currentMonth - 1;
-    const savedData = localStorage.getItem(`dailyData_${newYear}_${newMonth}`);
-    setDailyData(savedData ? JSON.parse(savedData) : {});
     setSelectedDay(null);
   };
 
@@ -39,79 +84,107 @@ function CalendarDash() {
     } else {
       setCurrentMonth(prevMonth => prevMonth + 1);
     }
-    const newYear = currentMonth === 11 ? currentYear + 1 : currentYear;
-    const newMonth = currentMonth === 11 ? 0 : currentMonth + 1;
-    const savedData = localStorage.getItem(`dailyData_${newYear}_${newMonth}`);
-    setDailyData(savedData ? JSON.parse(savedData) : {});
     setSelectedDay(null);
   };
 
-  const handleImageUpload = (e) => {
-    if (!selectedDay) return;
+  const handleImageUpload = async (e) => {
+    if (!selectedDay || !user || !selectedPlantProfile) return;
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setDailyData(prev => ({
-          ...prev,
-          [selectedDay]: {
-            ...prev[selectedDay],
-            image: reader.result, // Store Base64 string in localStorage
-          },
-        }));
+      reader.onloadend = async () => {
+        try {
+          const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(selectedDay).padStart(2, '0')}`;
+          await setDoc(
+            doc(db, `users/${user.uid}/plantProfiles/${selectedPlantProfile.id}/calendar`, dateStr),
+            {
+              ...dailyData[selectedDay],
+              image: reader.result,
+              createdAt: new Date().toISOString()
+            },
+            { merge: true }
+          );
+        } catch (err) {
+          console.error('Error saving image to Firestore:', err);
+        }
       };
       reader.readAsDataURL(file);
     }
   };
 
-  const handleRemoveImage = () => {
-    if (!selectedDay) return;
-    setDailyData(prev => {
-      const updatedDay = { ...prev[selectedDay] };
+  const handleRemoveImage = async () => {
+    if (!selectedDay || !user || !selectedPlantProfile) return;
+    try {
+      const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(selectedDay).padStart(2, '0')}`;
+      const updatedDay = { ...dailyData[selectedDay] };
       delete updatedDay.image;
-      return {
-        ...prev,
-        [selectedDay]: updatedDay,
-      };
-    });
+      await setDoc(
+        doc(db, `users/${user.uid}/plantProfiles/${selectedPlantProfile.id}/calendar`, dateStr),
+        updatedDay,
+        { merge: true }
+      );
+    } catch (err) {
+      console.error('Error removing image from Firestore:', err);
+    }
   };
 
-  const handleCheckboxChange = (type, checked) => {
-    if (!selectedDay) return;
-    setDailyData(prev => {
-      const updatedDay = { ...prev[selectedDay] };
+  const handleCheckboxChange = async (type, checked) => {
+    if (!selectedDay || !user || !selectedPlantProfile) return;
+    try {
+      const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(selectedDay).padStart(2, '0')}`;
+      const updatedDay = { ...dailyData[selectedDay] };
       updatedDay[type] = checked;
       if (!checked) {
         delete updatedDay[`${type}Type`];
         delete updatedDay[`${type}Amount`];
       }
-      return {
-        ...prev,
-        [selectedDay]: updatedDay,
-      };
-    });
+      await setDoc(
+        doc(db, `users/${user.uid}/plantProfiles/${selectedPlantProfile.id}/calendar`, dateStr),
+        {
+          ...updatedDay,
+          createdAt: new Date().toISOString()
+        },
+        { merge: true }
+      );
+    } catch (err) {
+      console.error(`Error updating ${type} in Firestore:`, err);
+    }
   };
 
-  const handleTypeChange = (type, value) => {
-    if (!selectedDay) return;
-    setDailyData(prev => ({
-      ...prev,
-      [selectedDay]: {
-        ...prev[selectedDay],
-        [`${type}Type`]: value,
-      },
-    }));
+  const handleTypeChange = async (type, value) => {
+    if (!selectedDay || !user || !selectedPlantProfile) return;
+    try {
+      const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(selectedDay).padStart(2, '0')}`;
+      await setDoc(
+        doc(db, `users/${user.uid}/plantProfiles/${selectedPlantProfile.id}/calendar`, dateStr),
+        {
+          ...dailyData[selectedDay],
+          [`${type}Type`]: value,
+          createdAt: new Date().toISOString()
+        },
+        { merge: true }
+      );
+    } catch (err) {
+      console.error(`Error updating ${type} type in Firestore:`, err);
+    }
   };
 
-  const handleAmountChange = (type, value) => {
-    if (!selectedDay) return;
-    setDailyData(prev => ({
-      ...prev,
-      [selectedDay]: {
-        ...prev[selectedDay],
-        [`${type}Amount`]: value,
-      },
-    }));
+  const handleAmountChange = async (type, value) => {
+    if (!selectedDay || !user || !selectedPlantProfile) return;
+    try {
+      const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(selectedDay).padStart(2, '0')}`;
+      await setDoc(
+        doc(db, `users/${user.uid}/plantProfiles/${selectedPlantProfile.id}/calendar`, dateStr),
+        {
+          ...dailyData[selectedDay],
+          [`${type}Amount`]: value,
+          createdAt: new Date().toISOString()
+        },
+        { merge: true }
+      );
+    } catch (err) {
+      console.error(`Error updating ${type} amount in Firestore:`, err);
+    }
   };
 
   const events = Object.keys(dailyData).reduce((acc, day) => {
@@ -136,6 +209,9 @@ function CalendarDash() {
   return (
     <div className="dashboard-content">
       <h1>Calendar</h1>
+      {!selectedPlantProfile && (
+        <p>Please select a plant profile to manage calendar data.</p>
+      )}
       <div className="month-navigation">
         <button className="nav-button" onClick={handlePrevMonth}>
           Previous
@@ -150,12 +226,12 @@ function CalendarDash() {
           year={currentYear}
           events={events}
           images={images}
-          onDayClick={setSelectedDay}
+          onDayClick={selectedPlantProfile ? setSelectedDay : () => {}}
         />
         <div className="soil-status">
           <div className="soil-card">
             <h3>{selectedDay ? `Day ${selectedDay}` : 'Select a Day'}</h3>
-            {selectedDay && (
+            {selectedDay && selectedPlantProfile && (
               <>
                 <div className="image-upload">
                   {!dailyData[selectedDay]?.image ? (
