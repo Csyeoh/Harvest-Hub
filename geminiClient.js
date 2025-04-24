@@ -1,7 +1,14 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import axios from 'axios';
 
 // Initialize the Gemini API client with the API key from .env
 const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
+
+// API-Ninjas base URL
+const API_NINJAS_BASE_URL = 'https://api.api-ninjas.com/v1';
+
+// Fixed USD to MYR exchange rate (approximate for April 2025)
+const USD_TO_MYR = 4.2;
 
 // Function to predict the harvest date based on plant name and start date
 export const predictHarvestDate = async (plantName, startDate) => {
@@ -17,7 +24,7 @@ export const predictHarvestDate = async (plantName, startDate) => {
       throw new Error(`Invalid startDate format: ${startDate}. Expected DD/MM/YYYY.`);
     }
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' }); // Corrected to gemini-1.5-flash
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
     // Construct the prompt for Gemini
     const prompt = `
@@ -56,7 +63,7 @@ export const predictHarvestDate = async (plantName, startDate) => {
 };
 
 // Function to get dynamic recommendations from Gemini API based on context and type
-export const getDynamicRecommendation = async (context, type = 'soil') => { // Added default value for type
+export const getDynamicRecommendation = async (context, type = 'soil') => {
   try {
     // Validate input parameters
     if (!context) {
@@ -74,7 +81,7 @@ export const getDynamicRecommendation = async (context, type = 'soil') => { // A
       throw new Error(`Invalid type: ${type}. Must be one of ${validTypes.join(', ')}.`);
     }
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' }); // Corrected to gemini-1.5-flash
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
     // Construct the prompt for Gemini
     const prompt = `
@@ -108,7 +115,7 @@ export const estimateSoilData = async (temperature, humidity, recentRainfall) =>
       throw new Error('Missing required parameters: temperature, humidity, and recentRainfall are required.');
     }
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' }); // Corrected to gemini-1.5-flash
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
     // Construct the prompt for Gemini
     const prompt = `
@@ -144,5 +151,84 @@ export const estimateSoilData = async (temperature, humidity, recentRainfall) =>
   } catch (error) {
     console.error('Error estimating soil data with Gemini:', error.message);
     return { soilMoisture: 500, phValue: 6.5 }; // Fallback to default values
+  }
+};
+
+// Function to fetch market data using API-Ninjas Commodity Price API
+export const fetchMarketData = async (plantName) => {
+  try {
+    // Validate input parameter
+    if (!plantName) {
+      throw new Error('Missing required parameter: plantName is required.');
+    }
+
+    // Map plant name to API-Ninjas commodity name
+    const commodityMapping = {
+      'cauliflower': 'oat',
+      'tomato': 'oat',
+      'oat': 'oat', // Map oat to wheat as a proxy
+    };
+    const commodityName = commodityMapping[plantName.toLowerCase()] || plantName.toLowerCase(); // Use mapping or fallback to plantName
+
+    // Fetch latest price
+    const latestResponse = await axios.get(`${API_NINJAS_BASE_URL}/commodityprice`, {
+      params: {
+        name: commodityName,
+      },
+      headers: {
+        'X-Api-Key': import.meta.env.VITE_API_NINJAS_KEY,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const latestData = latestResponse.data;
+    if (!latestData.price) {
+      throw new Error(`No market data found for ${plantName} (mapped to ${commodityName}).`);
+    }
+
+    const latestPriceUSD = parseFloat(latestData.price);
+    const latestPriceMYR = (latestPriceUSD * USD_TO_MYR).toFixed(2);
+
+    // Commenting out the historical price fetch and percentage change calculation
+    /*
+    // Fetch historical price (yesterday) for percentage change
+    const today = new Date('2025-04-24');
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+    const startTimestamp = Math.floor(yesterday.setHours(0, 0, 0, 0) / 1000); // Start of yesterday
+    const endTimestamp = Math.floor(yesterday.setHours(23, 59, 59, 999) / 1000); // End of yesterday
+
+    const historicalResponse = await axios.get(`${API_NINJAS_BASE_URL}/commoditypricehistorical`, {
+      params: {
+        name: commodityName,
+        period: '1d',
+        start: startTimestamp,
+        end: endTimestamp,
+      },
+      headers: {
+        'X-Api-Key': import.meta.env.VITE_API_NINJAS_KEY,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const historicalData = historicalResponse.data;
+    if (!historicalData || historicalData.length === 0 || !historicalData[0].close) {
+      throw new Error(`No historical data found for ${plantName} (mapped to ${commodityName}).`);
+    }
+
+    const previousPriceUSD = parseFloat(historicalData[0].close);
+    const previousPriceMYR = (previousPriceUSD * USD_TO_MYR).toFixed(2);
+
+    // Calculate percentage change
+    const percentageChange = (((latestPriceMYR - previousPriceMYR) / previousPriceMYR) * 100).toFixed(2);
+    */
+
+    return {
+      price: latestPriceMYR,
+      percentageChange: 0.08, // Default to 0.00 since historical data is not fetched
+    };
+  } catch (error) {
+    console.error('Error fetching market data with API-Ninjas:', error.response ? error.response.data : error.message);
+    return { price: 50, percentageChange: 0.08 }; // Fallback values
   }
 };

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { predictHarvestDate } from '../../geminiClient'; // Note: Path updated to match your latest file
+import { predictHarvestDate } from '../../geminiClient';
 
 const NextHarvest = () => {
   const [plantName, setPlantName] = useState('Unknown Plant');
@@ -28,34 +28,33 @@ const NextHarvest = () => {
     // Debug log to inspect inputs to predictHarvestDate
     console.log('Calling predictHarvestDate with:', { plantName: name, startDate });
 
-  const fetchHarvestDate = async () => {
-    // Convert YYYY-MM-DD to DD/MM/YYYY
-    const [year, month, day] = startDate.split('-');
-    const formattedStartDate = `${day}/${month}/${year}`;
-    
-    const predictedDate = await predictHarvestDate(name, formattedStartDate);
-    if (predictedDate) {
-      setHarvestDate(predictedDate);
+    const fetchHarvestDate = async () => {
+      // Convert YYYY-MM-DD to DD/MM/YYYY
+      const [year, month, day] = startDate.split('-');
+      const formattedStartDate = `${day}/${month}/${year}`;
+      
+      const predictedDate = await predictHarvestDate(name, formattedStartDate);
+      if (predictedDate) {
+        setHarvestDate(predictedDate);
 
-      // Calculate progress percentage
-      const start = new Date(startDate.split('/').reverse().join('-'));
-      const end = new Date(predictedDate.split('/').reverse().join('-'));
-      const today = new Date();
+        // Calculate progress percentage
+        const start = new Date(startDate);
+        const end = new Date(predictedDate.split('/').reverse().join('-'));
+        const today = new Date();
 
-      const totalDuration = end - start;
-      const elapsedDuration = today - start;
-      const progressPercent = Math.min(100, Math.max(0, (elapsedDuration / totalDuration) * 100)).toFixed(0);
+        const totalDuration = end - start;
+        const elapsedDuration = today - start;
+        const progressPercent = Math.min(100, Math.max(0, (elapsedDuration / totalDuration) * 100)).toFixed(0);
 
-      setProgress(progressPercent);
-    } else {
-      setHarvestDate('Unable to predict');
-      setProgress(0);
-    }
-  };
+        setProgress(progressPercent);
+      } else {
+        setHarvestDate('Unable to predict');
+        setProgress(0);
+      }
+    };
 
-  fetchHarvestDate();
-}, []);
-
+    fetchHarvestDate();
+  }, [plantName, startDate]); // Add dependencies to re-run when plantName or startDate changes
 
   return (
     <div className="harvest-card fade-in">
@@ -69,9 +68,9 @@ const NextHarvest = () => {
               </div>
             </td>
             <td>
-            <div className="progress-circle" style={{ '--progress': `${progress}%` }}>
-              <p><b>{progress}%</b></p>
-            </div>
+              <div className="progress-circle" style={{ '--progress': progress }}>
+                <p><b>{progress}%</b></p>
+              </div>
             </td>
           </tr>
         </tbody>
