@@ -1,12 +1,12 @@
 // pages/CropCultivation.jsx
 import React from 'react';
-import ImageUpload from '../components/ImageUpload';
+import CropDiseaseDetection from '../components/CropDiseaseDetection';
 
 const CropCultivation = () => {
   return (
     <div>
-      <h1>Crop Cultivation</h1>
-      <ImageUpload />
+      <h1>Crop Disease Detection</h1>
+      <CropDiseaseDetection />
     </div>
   );
 };
