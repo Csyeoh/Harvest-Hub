@@ -117,7 +117,7 @@ const Sidebar = () => {
           </NavLink>
           <NavLink to="/dashboard/crop-cultivation" className="nav-link mb-2">
             <i className="bi bi-search me-2"></i>
-            Crop Cultivation
+            Disease Detection
           </NavLink>
           <NavLink to="/dashboard/calendar" className="nav-link mb-2">
             <i className="bi bi-calendar3 me-2"></i>
