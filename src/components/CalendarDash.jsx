@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Calendar from '../components/CalendarComp';
 import { auth, db } from '../components/firebase';
-import { collection, doc, setDoc, onSnapshot } from 'firebase/firestore';
+import { collection, doc, setDoc, updateDoc, deleteField, onSnapshot } from 'firebase/firestore';
 import './CalendarDash.css';
 
 function CalendarDash() {
@@ -113,18 +113,34 @@ function CalendarDash() {
   };
 
   const handleRemoveImage = async () => {
-    if (!selectedDay || !user || !selectedPlantProfile) return;
+    if (!selectedDay || !user || !selectedPlantProfile) {
+      alert('Please select a day and ensure a plant profile is selected.');
+      return;
+    }
+
     try {
       const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(selectedDay).padStart(2, '0')}`;
-      const updatedDay = { ...dailyData[selectedDay] };
-      delete updatedDay.image;
-      await setDoc(
-        doc(db, `users/${user.uid}/plantProfiles/${selectedPlantProfile.id}/calendar`, dateStr),
-        updatedDay,
-        { merge: true }
-      );
+      const docRef = doc(db, `users/${user.uid}/plantProfiles/${selectedPlantProfile.id}/calendar`, dateStr);
+
+      // Remove the image field from Firestore
+      await updateDoc(docRef, {
+        image: deleteField()
+      });
+
+      // Update local state to remove the image
+      setDailyData((prev) => {
+        const updatedDay = { ...prev[selectedDay] };
+        delete updatedDay.image;
+        return {
+          ...prev,
+          [selectedDay]: updatedDay
+        };
+      });
+
+      alert('Image removed successfully!');
     } catch (err) {
       console.error('Error removing image from Firestore:', err);
+      alert('Failed to remove image. Check the console for details.');
     }
   };
 
