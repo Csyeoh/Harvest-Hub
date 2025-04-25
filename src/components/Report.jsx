@@ -2,12 +2,12 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Modal, Button } from 'react-bootstrap';
 import { auth, db } from '../components/firebase';
 import { collection, doc, getDoc, addDoc, onSnapshot } from 'firebase/firestore';
-import { fetchMarketData } from '../../geminiClient';
+import axios from 'axios';
 import './Report.css';
 
 function Report() {
   const [loggedInFarmer, setLoggedInFarmer] = useState('Loading...');
-  const [currentPrice, setCurrentPrice] = useState('RM50.00/kg');
+  const [currentPrice, setCurrentPrice] = useState({ price: 50, percentageChange: 0.08 });
   const [selectedPlantProfile, setSelectedPlantProfile] = useState({ name: 'Not selected', startDate: '', id: '' });
   const [formData, setFormData] = useState({
     plantingEnd: '',
@@ -26,11 +26,9 @@ function Report() {
     const unsubscribeAuth = auth.onAuthStateChanged((user) => {
       setUser(user);
       if (user) {
-        // Fetch farmer's name from auth displayName
         const displayName = user.displayName || 'Unknown Farmer';
         setLoggedInFarmer(displayName);
 
-        // Fetch current plant profile
         const profilesRef = collection(db, `users/${user.uid}/plantProfiles`);
         const unsubscribeSnapshot = onSnapshot(profilesRef, (snapshot) => {
           const profiles = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
@@ -53,27 +51,31 @@ function Report() {
       } else {
         setLoggedInFarmer('Unknown Farmer');
         setSelectedPlantProfile({ name: 'Not selected', startDate: '', id: '' });
-        setCurrentPrice('RM50.00/kg');
+        setCurrentPrice({ price: 50, percentageChange: 0.08 });
       }
     });
     return () => unsubscribeAuth();
   }, []);
 
   useEffect(() => {
-    const updateMarketPrice = async () => {
+    const fetchMarketPrice = async () => {
       if (selectedPlantProfile.name && selectedPlantProfile.name !== 'Not selected') {
         try {
-          const marketData = await fetchMarketData(selectedPlantProfile.name);
-          setCurrentPrice(`RM${marketData.price}/kg`);
+          const response = await axios.get(`http://localhost:3001/api/price/${selectedPlantProfile.name}`);
+          console.log(`Fetched price data for ${selectedPlantProfile.name}:`, response.data);
+          setCurrentPrice({
+            price: response.data.price,
+            percentageChange: response.data.percentageChange
+          });
         } catch (err) {
           console.error('Error fetching market price:', err);
-          setCurrentPrice('RM50.00/kg');
+          setCurrentPrice({ price: 50, percentageChange: 0.08 });
         }
       } else {
-        setCurrentPrice('RM50.00/kg');
+        setCurrentPrice({ price: 50, percentageChange: 0.08 });
       }
     };
-    updateMarketPrice();
+    fetchMarketPrice();
   }, [selectedPlantProfile.name]);
 
   useEffect(() => {
@@ -110,7 +112,7 @@ function Report() {
 
     let current = new Date(start);
     while (current <= end) {
-      const dateStr = current.toISOString().split('T')[0]; // YYYY-MM-DD
+      const dateStr = current.toISOString().split('T')[0];
       const calendarDocRef = doc(db, `users/${user.uid}/plantProfiles/${plantProfileId}/calendar`, dateStr);
       
       try {
@@ -189,9 +191,9 @@ function Report() {
       plantingEnd: formData.plantingEnd,
       harvestAmount: formData.harvestAmount,
       disease: formData.disease,
-      currentPrice,
-      pesticideDates, // Store flat array instead of columns
-      fertilizerDates, // Store flat array instead of columns
+      currentPrice: `RM${currentPrice.price}/kg (${currentPrice.percentageChange >= 0 ? '+' : ''}${currentPrice.percentageChange}%)`,
+      pesticideDates,
+      fertilizerDates,
       imagesInRange: images,
       totalPesticideAmount,
       totalFertilizerAmount,
@@ -229,9 +231,9 @@ function Report() {
       plantingEnd: formData.plantingEnd,
       harvestAmount: formData.harvestAmount,
       disease: formData.disease,
-      currentPrice,
-      pesticideColumns, // Use columns for display only
-      fertilizerColumns, // Use columns for display only
+      currentPrice: `RM${currentPrice.price}/kg (${currentPrice.percentageChange >= 0 ? '+' : ''}${currentPrice.percentageChange}%)`,
+      pesticideColumns,
+      fertilizerColumns,
       imagesInRange: images,
       totalPesticideAmount,
       totalFertilizerAmount,
@@ -251,7 +253,6 @@ function Report() {
   };
 
   const handleViewReport = (report) => {
-    // Convert pesticideDates and fertilizerDates to columns for display
     const updatedReport = {
       ...report,
       pesticideColumns: splitIntoColumns(report.pesticideDates || []),
@@ -348,7 +349,7 @@ function Report() {
                 <label>Current Price (RM /kg):</label>
                 <input
                   type='text'
-                  value={currentPrice}
+                  value={`RM${currentPrice.price}/kg (${currentPrice.percentageChange >= 0 ? '+' : ''}${currentPrice.percentageChange}%)`}
                   disabled
                   placeholder='From market data'
                 />
@@ -400,9 +401,7 @@ function Report() {
               <div className='report-header-line'></div>
               <div className='report-details'>
                 <div className='column'>
-                  <p><strong>Farmer's Name:</strong> {(report ||
-
- selectedReport).farmerName}</p>
+                  <p><strong>Farmer's Name:</strong> {(report || selectedReport).farmerName}</p>
                   <p><strong>Plant:</strong> {(report || selectedReport).plant}</p>
                   <p><strong>Start Date:</strong> {(report || selectedReport).plantingStart}</p>
                   <p><strong>End Date:</strong> {(report || selectedReport).plantingEnd}</p>

@@ -2,13 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { FaLeaf } from 'react-icons/fa';
 import { auth, db } from './firebase';
 import { collection, onSnapshot } from 'firebase/firestore';
-import { fetchMarketData } from '../../geminiClient';
+import axios from 'axios';
 
 const Markets = () => {
   const [selectedPlant, setSelectedPlant] = useState('Cauliflower');
-  const [price, setPrice] = useState(50);
-  const [percentageChange, setPercentageChange] = useState(0.08);
+  const [price, setPrice] = useState(null);
+  const [percentageChange, setPercentageChange] = useState(null);
+  const [lastUpdated, setLastUpdated] = useState(null);
   const [_user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const unsubscribeAuth = auth.onAuthStateChanged((currentUser) => {
@@ -37,20 +40,28 @@ const Markets = () => {
   }, []);
 
   useEffect(() => {
-    const updateMarketData = async () => {
+    const fetchMarketData = async () => {
+      setLoading(true);
+      setError(null);
       try {
-        const marketData = await fetchMarketData(selectedPlant);
-        setPrice(marketData.price);
-        setPercentageChange(marketData.percentageChange);
+        const response = await axios.get(`http://localhost:3001/api/price/${selectedPlant}`);
+        console.log(`Fetched data for ${selectedPlant}:`, response.data);
+        setPrice(response.data.price);
+        setPercentageChange(response.data.percentageChange);
+        setLastUpdated(new Date().toLocaleString());
       } catch (err) {
         console.error('Error fetching market data:', err);
+        setError('Failed to fetch market data. Using default values.');
         setPrice(50);
         setPercentageChange(0.08);
+        setLastUpdated(new Date().toLocaleString());
+      } finally {
+        setLoading(false);
       }
     };
 
-    updateMarketData();
-    const interval = setInterval(updateMarketData, 300000);
+    fetchMarketData();
+    const interval = setInterval(fetchMarketData, 300000);
 
     return () => clearInterval(interval);
   }, [selectedPlant]);
@@ -65,12 +76,24 @@ const Markets = () => {
         <p className="plant-name">{selectedPlant}</p>
         <p className="unit">RM/kg</p>
       </div>
+      {error && <p className="error-message" style={{ color: 'red', fontSize: '0.9em' }}>{error}</p>}
       <div className="market-item values">
-        <p className={`market-value ${percentageChange >= 0 ? 'positive' : 'negative'}`}>
-          {percentageChange >= 0 ? '+' : ''}{percentageChange}%
-        </p>
-        <p className="market-value price">{price}</p>
+        {loading ? (
+          <p>Loading...</p>
+        ) : (
+          <>
+            <p className={`market-value ${percentageChange >= 0 ? 'positive' : 'negative'}`}>
+              {percentageChange >= 0 ? '+' : ''}{percentageChange}%
+            </p>
+            <p className="market-value price">{price}</p>
+          </>
+        )}
       </div>
+      {lastUpdated && (
+        <p className="last-updated" style={{ fontSize: '0.8em', color: '#666', marginTop: '8px' }}>
+          Last Updated: {lastUpdated}
+        </p>
+      )}
     </div>
   );
 };

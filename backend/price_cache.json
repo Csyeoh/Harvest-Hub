@@ -1,0 +1,14 @@
+{
+  "tomato": {
+    "price": "9.00",
+    "percentageChange": "5.26"
+  },
+  "Cauliflower": {
+    "price": "4.00",
+    "percentageChange": "5.26"
+  },
+  "corn": {
+    "price": "0.02",
+    "percentageChange": "5.26"
+  }
+}
