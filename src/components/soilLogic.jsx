@@ -55,7 +55,7 @@ const useSoilLogic = () => {
     const fetchWeather = async () => {
       try {
         const apiKey = import.meta.env.VITE_OPENWEATHERMAP_API_KEY;
-        const city = import.meta.env.VITE_WEATHER_CITY || 'London';
+        const city = import.meta.env.VITE_WEATHER_CITY || 'Gelugor';
         const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
         const response = await fetch(url);
         if (!response.ok) {
